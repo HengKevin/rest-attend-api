@@ -18,7 +18,6 @@ model Users {
 
 model Attendances {
     id          Int      @id @default(autoincrement())
-    userId      Int
     createdAt   DateTime @default(now())
     temperature String?
     status      String?
