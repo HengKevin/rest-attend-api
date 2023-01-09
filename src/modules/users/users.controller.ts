@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity as User } from './user.entity';
@@ -19,5 +19,11 @@ export class UsersController {
   async findAll() {
     // get all posts in the db
     return await this.userService.findAll();
+  }
+
+  @Delete(':email')
+  @ApiOkResponse({ type: User })
+  async deleteOne(@Param('email') email: string) {
+    return await this.userService.deleteOne(email);
   }
 }
