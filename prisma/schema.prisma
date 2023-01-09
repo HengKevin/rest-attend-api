@@ -7,7 +7,7 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
     id          Int      @id @default(autoincrement())
     name        String
     email       String   @unique
@@ -23,6 +23,6 @@ model Attendances {
     temperature String?
     status      String?
     location    String?
-    user        User     @relation(fields: [userEmail], references: [email])
+    user        Users     @relation(fields: [userEmail], references: [email])
     userEmail   String
 }
