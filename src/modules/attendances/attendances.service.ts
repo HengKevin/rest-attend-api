@@ -17,4 +17,8 @@ export class AttendancesService {
   findAllByUserEmail(userEmail: string) {
     return this.prisma.attendances.findMany({ where: { userEmail } });
   }
+
+  deleteOne(id: number) {
+    return this.prisma.attendances.delete({ where: { id } });
+  }
 }
