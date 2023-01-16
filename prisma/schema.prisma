@@ -19,9 +19,11 @@ model Users {
 model Attendances {
     id          Int      @id @default(autoincrement())
     createdAt   DateTime @default(now())
+    date        String?
     temperature String?
     status      String?
     location    String?
+    time        String?
     user        Users     @relation(fields: [userEmail], references: [email])
     userEmail   String
 }
