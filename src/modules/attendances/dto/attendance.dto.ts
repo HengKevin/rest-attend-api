@@ -12,7 +12,15 @@ export class AttendanceDto {
 
   @IsString()
   @ApiProperty({ required: false })
+  date?: string;
+
+  @IsString()
+  @ApiProperty({ required: false })
   location?: string;
+
+  @IsString()
+  @ApiProperty({ required: false })
+  time?: string;
 
   @IsString()
   @ApiProperty({ required: false })

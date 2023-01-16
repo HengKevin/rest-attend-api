@@ -26,6 +26,12 @@ export class AttendancesController {
     return this.attendanceService.findAllByUserEmail(email);
   }
 
+  @Get(':date')
+  @ApiCreatedResponse({ type: Attendance })
+  findAllByDate(@Param('date') date: string) {
+    return this.attendanceService.findAllByDate(date);
+  }
+
   @Delete(':id')
   @ApiCreatedResponse({ type: Attendance })
   deleteOne(@Param('id', ParseIntPipe) id: number) {

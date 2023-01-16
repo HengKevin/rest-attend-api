@@ -9,6 +9,9 @@ export class AttendanceEntity implements Attendances {
   createdAt: Date;
 
   @ApiProperty()
+  date: string;
+
+  @ApiProperty()
   temperature: string;
 
   @ApiProperty()
@@ -19,4 +22,7 @@ export class AttendanceEntity implements Attendances {
 
   @ApiProperty()
   location: string;
+
+  @ApiProperty()
+  time: string;
 }
