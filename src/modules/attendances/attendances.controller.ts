@@ -26,6 +26,12 @@ export class AttendancesController {
     return this.attendanceService.findAllByUserEmail(email);
   }
 
+  @Get('/location/:location')
+  @ApiCreatedResponse({ type: Attendance })
+  findAllByLocation(@Param('location') location: string) {
+    return this.attendanceService.findAllByLocation(location);
+  }
+
   @Get('/date/:date')
   @ApiCreatedResponse({ type: Attendance })
   findAllByDate(@Param('date') date: string) {

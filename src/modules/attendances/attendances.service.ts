@@ -28,6 +28,10 @@ export class AttendancesService {
     });
   }
 
+  findAllByLocation(location: string) {
+    return this.prisma.attendances.findMany({ where: { location: location } });
+  }
+
   deleteOne(id: number) {
     return this.prisma.attendances.delete({ where: { id } });
   }
