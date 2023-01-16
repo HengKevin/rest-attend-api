@@ -32,6 +32,15 @@ export class AttendancesController {
     return this.attendanceService.findAllByDate(date);
   }
 
+  @Get('/location/:location/date/:date')
+  @ApiCreatedResponse({ type: Attendance })
+  findAllByLocationAndDate(
+    @Param('location') location: string,
+    @Param('date') date: string,
+  ) {
+    return this.attendanceService.findAllByLocationAndDate(location, date);
+  }
+
   @Delete(':id')
   @ApiCreatedResponse({ type: Attendance })
   deleteOne(@Param('id', ParseIntPipe) id: number) {

@@ -22,6 +22,12 @@ export class AttendancesService {
     return this.prisma.attendances.findMany({ where: { date } });
   }
 
+  findAllByLocationAndDate(location: string, date: string) {
+    return this.prisma.attendances.findMany({
+      where: { AND: [{ location: location }, { date: date }] },
+    });
+  }
+
   deleteOne(id: number) {
     return this.prisma.attendances.delete({ where: { id } });
   }
