@@ -21,4 +21,8 @@ export class UsersService {
   deleteOne(email: string) {
     return this.prisma.users.delete({ where: { email } });
   }
+
+  updateOneName(id: number, name: string) {
+    return this.prisma.users.update({ where: { id }, data: { name: name } });
+  }
 }
