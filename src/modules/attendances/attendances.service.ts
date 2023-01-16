@@ -19,7 +19,7 @@ export class AttendancesService {
   }
 
   findAllByDate(date: string) {
-    return this.prisma.attendances.findMany({ where: { date } });
+    return this.prisma.attendances.findMany({ where: { date: date } });
   }
 
   deleteOne(id: number) {
