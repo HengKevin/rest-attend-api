@@ -26,7 +26,7 @@ export class AttendancesController {
     return this.attendanceService.findAllByUserEmail(email);
   }
 
-  @Get(':date')
+  @Get('/date/:date')
   @ApiCreatedResponse({ type: Attendance })
   findAllByDate(@Param('date') date: string) {
     return this.attendanceService.findAllByDate(date);
