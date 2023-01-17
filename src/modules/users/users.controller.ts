@@ -31,10 +31,10 @@ export class UsersController {
     return await this.userService.findAll();
   }
 
-  @Delete(':email')
+  @Delete(':id')
   @ApiOkResponse({ type: User })
-  async deleteOne(@Param('email') email: string) {
-    return await this.userService.deleteOne(email);
+  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.userService.deleteOne(id);
   }
 
   @Patch(':id')

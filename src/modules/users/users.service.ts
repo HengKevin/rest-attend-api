@@ -18,8 +18,8 @@ export class UsersService {
     return this.prisma.users.findUnique({ where: { email } });
   }
 
-  deleteOne(email: string) {
-    return this.prisma.users.delete({ where: { email } });
+  deleteOne(id: number) {
+    return this.prisma.users.delete({ where: { id } });
   }
 
   updateOneName(id: number, name: string) {
