@@ -24,6 +24,14 @@ model Attendances {
     status      String?
     location    String?
     time        String?
-    user        Users     @relation(fields: [userEmail], references: [email])
+    user        Users     @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
+}
+
+model AttendanceRule {
+    id          Int      @id @default(autoincrement())
+    earlyMinute String?
+    lateMinute  String?
+    offDutyTime String?
+    onDutyTime  String?
 }
