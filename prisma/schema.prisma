@@ -27,3 +27,11 @@ model Attendances {
     user        Users     @relation(fields: [userEmail], references: [email])
     userEmail   String
 }
+
+model AttendanceRule {
+    id          Int      @id @default(autoincrement())
+    earlyMinute String?
+    lateMinute  String?
+    offDutyTime String?
+    onDutyTime  String?
+}

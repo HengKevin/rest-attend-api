@@ -1,11 +1,12 @@
 import { Controller, Get, ParseIntPipe, Post } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 import { AttendanceEntity as Attendance } from './attendance.entity';
-import { ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Body, Delete, Param } from '@nestjs/common/decorators';
 import { AttendanceDto } from './dto/attendance.dto';
 
 @Controller('attendances')
+@ApiTags('attendances')
 export class AttendancesController {
   constructor(private readonly attendanceService: AttendancesService) {}
 
