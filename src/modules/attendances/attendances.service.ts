@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceDto } from './dto/attendance.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class AttendancesService {
@@ -60,5 +61,33 @@ export class AttendancesService {
 
   deleteOne(id: number) {
     return this.prisma.attendances.delete({ where: { id } });
+  }
+
+  async calculateAttendanceStatus(date: string, userEmail: string) {
+    const filter = await this.findAllByDateAndEmail(date, userEmail);
+    const checkIn = filter[0].time;
+    const checkOut = filter[filter.length - 1].time;
+
+    const time1 = moment(checkIn, 'HH:mm');
+    const time2 = moment(checkOut, 'HH:mm');
+
+    const diff = time2.diff(time1);
+    const diffMinute = moment.duration(diff).asMinutes();
+
+    let stats = '';
+    if (filter.length > 1) {
+      if (diffMinute >= 15) {
+        stats = 'Late';
+      } else {
+        stats = 'Present';
+      }
+    } else {
+      stats = 'Absent';
+    }
+    const updateUser = await this.prisma.users.update({
+      where: { email: filter[0].userEmail },
+      data: { attendanceStatus: stats },
+    });
+    return stats;
   }
 }

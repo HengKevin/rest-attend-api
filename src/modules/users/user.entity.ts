@@ -21,4 +21,7 @@ export class UserEntity implements Users {
 
   @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
+  attendanceStatus: string;
 }

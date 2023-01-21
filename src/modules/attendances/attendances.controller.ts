@@ -2,7 +2,7 @@ import { Controller, Get, ParseIntPipe, Post } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 import { AttendanceEntity as Attendance } from './attendance.entity';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Body, Delete, Param } from '@nestjs/common/decorators';
+import { Body, Delete, Param, Patch } from '@nestjs/common/decorators';
 import { AttendanceDto } from './dto/attendance.dto';
 
 @Controller('attendances')
@@ -40,6 +40,18 @@ export class AttendancesController {
   @Post()
   create(@Body() attendanceDto: AttendanceDto) {
     return this.attendanceService.create(attendanceDto);
+  }
+
+  @Patch('calculateAttendanceStatus/:date/:userEmail')
+  @ApiCreatedResponse({ type: Attendance })
+  async calculateAttendanceStatus(
+    @Param('date') date: string,
+    @Param('userEmail') userEmail: string,
+  ) {
+    return await this.attendanceService.calculateAttendanceStatus(
+      date,
+      userEmail,
+    );
   }
 
   @Get(':date')
