@@ -15,32 +15,50 @@ export class AttendancesController {
     return this.attendanceService.findAll();
   }
 
-  @Post()
+  // @Get(':date/:userEmail')
+  // @ApiCreatedResponse({ type: Attendance })
+  // async findAllByDateAndEmail(
+  //   @Param('date') date: string,
+  //   @Param('userEmail') userEmail: string,
+  // ) {
+  //   const res = await this.attendanceService.findAllByDateAndEmail(
+  //     date,
+  //     userEmail,
+  //   );
+  //   return res;
+  // }
+
+  @Get('calculateAttendance/:date/:userEmail')
   @ApiCreatedResponse({ type: Attendance })
+  async calculateAttendance(
+    @Param('date') date: string,
+    @Param('userEmail') userEmail: string,
+  ) {
+    return await this.attendanceService.calculateAttendance(date, userEmail);
+  }
+
+  @Post()
   create(@Body() attendanceDto: AttendanceDto) {
     return this.attendanceService.create(attendanceDto);
   }
 
-  @Get(':email')
-  @ApiCreatedResponse({ type: Attendance })
-  findAllByUserEmail(@Param('email') email: string) {
-    return this.attendanceService.findAllByUserEmail(email);
-  }
-
-  @Get('/location/:location')
-  @ApiCreatedResponse({ type: Attendance })
-  findAllByLocation(@Param('location') location: string) {
-    return this.attendanceService.findAllByLocation(location);
-  }
-
-  @Get('/date/:date')
-  @ApiCreatedResponse({ type: Attendance })
+  @Get(':date')
   findAllByDate(@Param('date') date: string) {
     return this.attendanceService.findAllByDate(date);
   }
 
-  @Get('/location/:location/date/:date')
-  @ApiCreatedResponse({ type: Attendance })
+  @Get(':email')
+  findAllByUserEmail(@Param('email') email: string) {
+    return this.attendanceService.findAllByUserEmail(email);
+  }
+
+  @Get(':location')
+  findAllByLocation(@Param('location') location: string) {
+    console.log('Hello');
+    return this.attendanceService.findAllByLocation(location);
+  }
+
+  @Get(':location/:date')
   findAllByLocationAndDate(
     @Param('location') location: string,
     @Param('date') date: string,
@@ -49,7 +67,6 @@ export class AttendancesController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: Attendance })
   deleteOne(@Param('id', ParseIntPipe) id: number) {
     return this.attendanceService.deleteOne(id);
   }
