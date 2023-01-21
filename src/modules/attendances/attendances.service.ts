@@ -22,6 +22,29 @@ export class AttendancesService {
     return this.prisma.attendances.findMany({ where: { date } });
   }
 
+  async findAllByDateAndEmail(date: string, userEmail: string) {
+    const res = await this.prisma.attendances.findMany({
+      where: { AND: [{ date: date }, { userEmail: userEmail }] },
+    });
+    return res;
+  }
+
+  async calculateAttendance(date: string, userEmail: string) {
+    const filter = await this.findAllByDateAndEmail(date, userEmail);
+
+    const checkIn = filter[0].time;
+    const checkOut = filter[filter.length - 1].time;
+    const filter0_id = filter[0].id;
+    const filter1_id = filter[filter.length - 1].id;
+
+    const updateUser = await this.prisma.users.update({
+      where: { email: filter[0].userEmail },
+      data: { checkIn: checkIn, checkOut: checkOut },
+    });
+
+    return filter;
+  }
+
   findAllByLocationAndDate(location: string, date: string) {
     return this.prisma.attendances.findMany({
       where: { AND: [{ location: location }, { date: date }] },
