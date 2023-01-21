@@ -33,17 +33,9 @@ export class AttendancesService {
     const filter = await this.findAllByDateAndEmail(date, userEmail);
 
     const checkIn = filter[0].time;
-    const checkOut = filter[1].time;
+    const checkOut = filter[filter.length - 1].time;
     const filter0_id = filter[0].id;
-    const filter1_id = filter[1].id;
-
-    console.log(checkIn);
-    console.log(checkOut);
-    console.log(filter0_id);
-    console.log(filter1_id);
-
-    console.log(filter[0]);
-    console.log(filter[1]);
+    const filter1_id = filter[filter.length - 1].id;
 
     const updateUser = await this.prisma.users.update({
       where: { email: filter[0].userEmail },
