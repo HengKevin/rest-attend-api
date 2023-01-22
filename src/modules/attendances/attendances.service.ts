@@ -88,6 +88,26 @@ export class AttendancesService {
       where: { email: filter[0].userEmail },
       data: { attendanceStatus: stats },
     });
-    return stats;
+    const exist = await this.prisma.historicAtt.findMany({
+      where: {
+        AND: [{ date: date }, { userEmail: filter[0].userEmail }],
+      },
+    });
+    if (exist.length > 0) {
+      return stats;
+    } else {
+      const createHist = await this.prisma.historicAtt.create({
+        data: {
+          date: date,
+          temperature: filter[0].temperature,
+          location: filter[0].location,
+          checkIn: checkIn,
+          checkOut: checkOut,
+          attendanceStatus: stats,
+          userEmail: filter[0].userEmail,
+        },
+      });
+      return stats;
+    }
   }
 }

@@ -17,6 +17,7 @@ model Users {
     attendanceStatus String?
     createdAt        DateTime      @default(now())
     attendances      Attendances[]
+    historicAtts     HistoricAtt[]
 }
 
 model Attendances {
@@ -37,4 +38,16 @@ model AttendanceRule {
     lateMinute  String?
     offDutyTime String?
     onDutyTime  String?
+}
+
+model HistoricAtt {
+    id          Int      @id @default(autoincrement())
+    date        String?
+    temperature String?
+    location    String?
+    checkIn     String?
+    checkOut    String?
+    attendanceStatus String?
+    user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+    userEmail   String
 }
