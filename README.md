@@ -36,16 +36,10 @@ yarn prisma migrate dev
 yarn prisma db push
 ```
 
-### Run seeds with prisma
+### Run the application on dev
 
 ```bash
-yarn prisma db seed
-```
-
-### Run the application
-
-```bash
-yarn dev
+yarn start:dev
 ```
 
 ### Run the tests
