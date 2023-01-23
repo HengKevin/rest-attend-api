@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiAcceptedResponse, ApiTags } from '@nestjs/swagger';
 import { AttendanceRuleService } from './attendance-rule.service';
 import { AttendanceRuleDto } from './dto/attendance-rule.dto';
@@ -40,7 +49,7 @@ export class AttendanceRuleController {
 
   @Get(':id')
   @ApiAcceptedResponse({ type: AttendanceRuleService })
-  findOne(@Body() id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.attendanceRuleService.findOne(id);
   }
 }

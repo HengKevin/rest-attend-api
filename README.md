@@ -233,6 +233,57 @@ GET / attendances?location=São Paulo
 ]
 ```
 
+### Create attendance-rule for organization
+
+```bash
+POST /attendance-rules
+```
+
+```json
+{
+    "earlyMinute": "15",
+    "lateMinute": "15",
+    "offDutyTime": "17:00",
+    "onDutyTime": "08:00",
+}
+```
+
+### List attendance-rules
+
+```bash
+GET /attendance-rules
+```
+
+```json
+[
+    {
+        "id": 1,
+        "earlyMinute": "15",
+        "lateMinute": "15",
+        "offDutyTime": "17:00",
+        "onDutyTime": "08:00",
+        "createdAt": "2023-01-23T8:00:00.000Z",
+    },
+]
+```
+
+### List attendance-rules by id
+
+```bash
+GET /attendance-rules/1
+```
+
+```json
+{
+    "id": 1,
+    "earlyMinute": "15",
+    "lateMinute": "15",
+    "offDutyTime": "17:00",
+    "onDutyTime": "08:00",
+    "createdAt": "2023-01-23T8:00:00.000Z",
+}
+```
+
 
 ## License
 
