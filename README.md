@@ -1,10 +1,28 @@
-# Rest-attend-api
+# Overview
 
-Rest attend api is a simple api to manage attendances of students in a school.
+    Rest attend api is a simple api to manage attendances of students at the Icubation Center. Our aim to build this api is to help the Icubation Center to manage the attendance of students and to help the students to check in and check out. This api is built with Nest js, a progressive Node.js framework for building efficient, reliable and scalable server-side applications.
 
-## Prerequisite
+## Features
 
-Prerequisites for this project are:
+-   [x] Create Users
+-   [x] Query User
+-   [x] Update User's name
+-   [x] Delete User
+-   [x] Create Attendance
+-   [x] Query Attendance by date
+-   [x] Query Attendance by user
+-   [x] Query Attendance by user and date
+-   [x] Query Attendance by location
+-   [x] Create Attendance rules
+-   [x] Query Attendance rules by id
+-   [x] Update Attendance rules 
+-   [x] Delete Attendance rules
+-   [x] Create Historic Attendance
+-   [x] Query Historic Attendance by user
+-   [x] Query Historic Attendance by user and date
+-   [x] Query Historic Attendance by date
+-   [x] Delete Historic Attendance
+
 
 ## Prerequisite
 
@@ -31,7 +49,7 @@ yarn install
 ### Run migrations
 
 ```bash
-yarn prisma migrate dev
+yarn prisma migrate
 ```
 
 ### Update Server's database
@@ -46,7 +64,7 @@ yarn prisma db push
 yarn start:dev
 ```
 
-### To access the Swagger documentation of api
+### To access the Swagger documentation of api localhost
 ```bash
 localhost:3000/api/v1
 ```
@@ -120,21 +138,20 @@ export class AppService {
 Entity is a class that represents a table in your database.
 
 ```bash
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
-@Entity()
-export class User {
-  @PrimaryGeneratedColumn()
+import { Users } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+export class UserEntity implements Users {
+  @ApiProperty()
   id: number;
 
-  @Column()
-  firstName: string;
+  @ApiProperty()
+  name: string;
 
-  @Column()
-  lastName: string;
+  @ApiProperty()
+  email: string;
 
-  @Column()
-  age: number;
+  @ApiProperty()
+  faceString: string;
 }
 ```
 
