@@ -65,6 +65,216 @@ yarn test
 DATABASE_URL=postgresql://{username}:{password}@{host}:{port}/{database_name}?schema=public
 ```
 
+## Understanding the architecture of Nest js
+
+### Controllers
+what is controller for?
+
+Controllers are responsible for handling incoming requests and returning responses to the client. You can think of them as the entry points (routes) to your application.
+Example
+
+```bash
+import { Controller, Get } from '@nestjs/common';
+
+@Controller()
+export class AppController {
+  @Get()
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+```
+
+### Services
+
+Services are the place where you put the business logic of your application. They are usually used to fetch data from the database, process it, and return it to the controller.
+
+```bash
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+```
+
+### Providers
+
+Providers are classes that can be injected into other classes, and they act as a bridge between different classes. They are usually used to share data between classes.
+
+```bash
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+```
+
+### Entity
+
+Entity is a class that represents a table in your database.
+
+```bash
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column()
+  age: number;
+}
+```
+
+### Dto
+
+Dto is a class that defines the shape of the data to be sent in a request.
+
+```bash
+import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
+
+export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly firstName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly lastName: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  readonly email: string;
+}
+```
+
+### Modules
+
+Modules are containers for controllers, providers, and other modules. They are used to group related functionality and provide a way to organize your application.
+
+```bash
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+## Modules
+
+### Users
+
+Users is to record all the users registered by the application.
+
+```bash
+├───src
+│   ├───modules
+│   │   └───users
+│   │       ├───dto
+│   │       │       user.dto.ts
+│   │       │       username.dto.ts
+│   │       │
+│   │       ├───user.entity.ts
+│   │       ├───users.controller.spec.ts
+│   │       ├───users.controller.ts
+│   │       ├───users.module.ts
+│   │       ├───users.service.spec.ts
+│   │       └───users.service.ts
+```
+
+### Attendances
+
+Attendances is to record the attendance checkIn and checkOut of the students.
+
+```bash
+├───src
+│   ├───modules
+│   │   └───attendances
+│   │       ├───dto
+│   │       │       attendance.dto.ts
+│   │       │
+│   │       ├───attendance.entity.ts
+│   │       ├───attendances.controller.spec.ts
+│   │       ├───attendances.controller.ts
+│   │       ├───attendances.module.ts
+│   │       ├───attendances.service.spec.ts
+│   │       └───attendances.service.ts
+```
+
+## Attendance rules
+
+Attendance rules is to record all the rules of the attendance set by the admin.
+
+```bash
+├───src
+│   ├───modules
+│   │   └───attendance-rules
+│   │       ├───dto
+│   │       │       attendance-rule.dto.ts
+│   │       │       update-attendance-rule.dto.ts
+│   │       │
+│   │       ├───attendance-rule.entity.ts
+│   │       ├───attendance-rule.controller.spec.ts
+│   │       ├───attendance-rule.controller.ts
+│   │       ├───attendance-rule.module.ts
+│   │       ├───attendance-rule.service.spec.ts
+│   │       └───attendance-rule.service.ts
+```
+
+## Historic attendances
+
+Historic sttendances is to record all the attendance and their status by date and location.
+
+```bash
+├───src
+│   ├───modules
+│   │   └───historic-attendances
+│   │       ├───dto
+│   │       │       historic-attendance.dto.ts
+│   │       │
+│   │       ├───historic-attendance.entity.ts
+│   │       ├───historic-attendance.controller.spec.ts
+│   │       ├───historic-attendance.controller.ts
+│   │       ├───historic-attendance.module.ts
+│   │       ├───historic-attendance.service.spec.ts
+│   │       └───historic-attendance.service.ts
+```
+
+### Prisma
+
+Prisma is an open-source ORM for Node.js and TypeScript. It is used to define the database schema and to generate the corresponding database client.
+
+```bash
+import { Injectable, INestApplication } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+
+@Injectable()
+export class PrismaService extends PrismaClient {
+  async enableShutdownHooks(app: INestApplication) {
+    this.$on('beforeExit', async () => {
+      await app.close();
+    });
+  }
+}
+```
+
 ## Usage
 
 ### Create a student
