@@ -2,20 +2,24 @@
 
 Rest attend api is a simple api to manage attendances of students in a school.
 
-## Installation
+## Prerequisite
 
-### Requirements
+Prerequisites for this project are:
 
--   [Node.js](https://nodejs.org/en/)
+## Prerequisite
+
+### Requirements for this project are
+
+-   [Node.js, v16.13.1](https://nodejs.org/fr/blog/release/v16.13.1/)
 -   [Postgresql](https://www.postgresql.org/)
 -   [Postman](https://www.getpostman.com/)
 -   [Git](https://git-scm.com/)
--   [Yarn](https://yarnpkg.com/)
+-   [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable)
 
 ### Clone the repository
 
 ```bash
-git clone
+git clone https://github.com/HengKevin/rest-attend-api.git
 ```
 
 ### Install dependencies
@@ -42,10 +46,23 @@ yarn prisma db push
 yarn start:dev
 ```
 
+### To access the Swagger documentation of api
+```bash
+localhost:3000/api/v1
+```
+
 ### Run the tests
 
 ```bash
 yarn test
+```
+
+## Local test
+
+### .env
+    
+```bash
+DATABASE_URL=postgresql://{username}:{password}@{host}:{port}/{database_name}?schema=public
 ```
 
 ## Usage
