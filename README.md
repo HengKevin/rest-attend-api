@@ -1,6 +1,8 @@
 # Overview
 
-    Rest attend api is a simple api to manage attendances of students at the Icubation Center. Our aim to build this api is to help the Icubation Center to manage the attendance of students and to help the students to check in and check out. This api is built with Nest js, a progressive Node.js framework for building efficient, reliable and scalable server-side applications.
+Rest attend api is a simple api to manage attendances of students at the Icubation Center. Our aim to build this api is to help the Icubation Center to manage the attendance of students and to help the students to check in and check out. 
+
+This api is built with Nest js, a progressive Node.js framework for building efficient, reliable and scalable server-side applications.
 
 ## Features
 
