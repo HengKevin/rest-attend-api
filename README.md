@@ -188,8 +188,8 @@ Users is to record all the users registered by the application.
 │   ├───modules
 │   │   └───users
 │   │       ├───dto
-│   │       │       user.dto.ts
-│   │       │       username.dto.ts
+│   │       │   ├───user.dto.ts
+│   │       │   ├───username.dto.ts
 │   │       │
 │   │       ├───user.entity.ts
 │   │       ├───users.controller.spec.ts
@@ -208,7 +208,7 @@ Attendances is to record the attendance checkIn and checkOut of the students.
 │   ├───modules
 │   │   └───attendances
 │   │       ├───dto
-│   │       │       attendance.dto.ts
+│   │       │   ├───attendance.dto.ts
 │   │       │
 │   │       ├───attendance.entity.ts
 │   │       ├───attendances.controller.spec.ts
@@ -227,8 +227,8 @@ Attendance rules is to record all the rules of the attendance set by the admin.
 │   ├───modules
 │   │   └───attendance-rules
 │   │       ├───dto
-│   │       │       attendance-rule.dto.ts
-│   │       │       update-attendance-rule.dto.ts
+│   │       │   ├───attendance-rule.dto.ts
+│   │       │   ├───update-attendance-rule.dto.ts
 │   │       │
 │   │       ├───attendance-rule.entity.ts
 │   │       ├───attendance-rule.controller.spec.ts
@@ -247,7 +247,7 @@ Historic sttendances is to record all the attendance and their status by date an
 │   ├───modules
 │   │   └───historic-attendances
 │   │       ├───dto
-│   │       │       historic-attendance.dto.ts
+│   │       │   ├───historic-attendance.dto.ts
 │   │       │
 │   │       ├───historic-attendance.entity.ts
 │   │       ├───historic-attendance.controller.spec.ts
@@ -262,16 +262,69 @@ Historic sttendances is to record all the attendance and their status by date an
 Prisma is an open-source ORM for Node.js and TypeScript. It is used to define the database schema and to generate the corresponding database client.
 
 ```bash
-import { Injectable, INestApplication } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+├───src
+│   ├───prisma
+│   │   ├───prisma.module.ts
+│   │   ├───prisma.service.spec.ts
+│   │   ├───prisma.service.ts
+```
 
-@Injectable()
-export class PrismaService extends PrismaClient {
-  async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
-  }
+## Project's schema
+
+For this project we will be using prisma to define the schema of the entire project.
+    
+```bash
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    firstName String
+    lastName  String
+    email     String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Attendance {
+    id        Int      @id @default(autoincrement())
+    status    String
+    date      String
+    location  String
+    time      String
+    temperature String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int
+}
+
+model AttendanceRule {
+    id        Int      @id @default(autoincrement())
+    status    String
+    date      String
+    location  String
+    time      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model HistoricAttendance {
+    id        Int      @id @default(autoincrement())
+    status    String
+    date      String
+    location  String
+    time      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int
 }
 ```
 
