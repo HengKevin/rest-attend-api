@@ -8,12 +8,16 @@ datasource db {
 }
 
 model Users {
-    id          Int      @id @default(autoincrement())
-    name        String
-    email       String   @unique
-    faceString  String
-    createdAt   DateTime @default(now())
-    attendances Attendances[]
+    id               Int           @id @default(autoincrement())
+    name             String
+    email            String        @unique
+    faceString       String
+    checkIn          String?
+    checkOut         String?
+    attendanceStatus String?
+    createdAt        DateTime      @default(now())
+    attendances      Attendances[]
+    historicAtts     HistoricAtt[]
 }
 
 model Attendances {
@@ -24,14 +28,26 @@ model Attendances {
     status      String?
     location    String?
     time        String?
-    user        Users     @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+    user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
 }
 
 model AttendanceRule {
-    id          Int      @id @default(autoincrement())
+    id          Int     @id @default(autoincrement())
     earlyMinute String?
     lateMinute  String?
     offDutyTime String?
     onDutyTime  String?
+}
+
+model HistoricAtt {
+    id          Int      @id @default(autoincrement())
+    date        String?
+    temperature String?
+    location    String?
+    checkIn     String?
+    checkOut    String?
+    attendanceStatus String?
+    user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+    userEmail   String
 }

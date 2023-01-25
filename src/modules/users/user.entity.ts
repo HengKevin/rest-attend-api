@@ -14,5 +14,14 @@ export class UserEntity implements Users {
   faceString: string;
 
   @ApiProperty()
+  checkIn: string;
+
+  @ApiProperty()
+  checkOut: string;
+
+  @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
+  attendanceStatus: string;
 }
