@@ -51,13 +51,13 @@ yarn install
 ### Run migrations
 
 ```bash
-yarn prisma migrate
+npx prisma generate
 ```
 
 ### Update Server's database
 
 ```bash
-yarn prisma db push
+nxp prisma db push
 ```
 
 ### Run the application on dev
@@ -345,6 +345,19 @@ model HistoricAttendance {
     user      User     @relation(fields: [userId], references: [id])
     userId    Int
 }
+```
+
+### Keynotes
+
+After making changes to the schema.primsa file, you will always need to run the following command to update the database.
+
+```bash
+npx prisma generate
+```
+Then run this command afterwards to update the database in the server.
+
+```bash
+npx prisma db push
 ```
 
 ## Usage
