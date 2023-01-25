@@ -37,7 +37,7 @@ export class AttendanceRuleController {
 
   @Delete(':id')
   @ApiAcceptedResponse({ type: AttendanceRuleService })
-  deleteOne(@Body() id: number) {
+  deleteOne(@Param('id', ParseIntPipe) id: number) {
     return this.attendanceRuleService.deleteOne(id);
   }
 
