@@ -7,20 +7,25 @@ import * as moment from 'moment';
 export class AttendancesService {
   constructor(private prisma: PrismaService) {}
 
-  create(attendance: AttendanceDto) {
-    return this.prisma.attendances.create({ data: { ...attendance } });
+  async create(attendance: AttendanceDto) {
+    const res = await this.prisma.attendances.create({
+      data: { ...attendance },
+    });
+    await this.calculateAttendance(attendance.date, attendance.userEmail);
+    await this.calculateAttendanceStatus(attendance.date, attendance.userEmail);
+    return res;
   }
 
-  findAll() {
+  async findAll() {
     return this.prisma.attendances.findMany();
   }
 
-  findAllByUserEmail(userEmail: string) {
-    return this.prisma.attendances.findMany({ where: { userEmail } });
+  async findAllByUserEmail(userEmail: string) {
+    return await this.prisma.attendances.findMany({ where: { userEmail } });
   }
 
-  findAllByDate(date: string) {
-    return this.prisma.attendances.findMany({ where: { date } });
+  async findAllByDate(date: string) {
+    return await this.prisma.attendances.findMany({ where: { date } });
   }
 
   async findAllByDateAndEmail(date: string, userEmail: string) {
@@ -39,6 +44,10 @@ export class AttendancesService {
     await this.prisma.users.update({
       where: { email: filter[0].userEmail },
       data: { checkIn: checkIn, checkOut: checkOut },
+    });
+    await this.prisma.historicAtt.updateMany({
+      where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+      data: { checkOut: checkOut },
     });
 
     return filter;
@@ -63,21 +72,23 @@ export class AttendancesService {
 
   async calculateAttendanceStatus(date: string, userEmail: string) {
     const filter = await this.findAllByDateAndEmail(date, userEmail);
+    const rule = await this.prisma.attendanceRule.findMany();
+    const onDuty = rule[0].onDutyTime;
+    const lateMinute = rule[0].lateMinute;
     const checkIn = filter[0].time;
     const checkOut = filter[filter.length - 1].time;
 
     const time1 = moment(checkIn, 'HH:mm');
-    const time2 = moment(checkOut, 'HH:mm');
+    const time2 = moment(onDuty, 'HH:mm').add(lateMinute, 'minutes');
 
-    const diff = time2.diff(time1);
-    const diffMinute = moment.duration(diff).asMinutes();
+    const diff = time2.diff(time1, 'minutes');
 
     let stats = '';
-    if (filter.length > 1) {
-      if (diffMinute >= 15) {
-        stats = 'Late';
-      } else {
+    if (filter.length >= 1) {
+      if (time1 < time2 || diff === 0) {
         stats = 'Present';
+      } else {
+        stats = 'Late';
       }
     } else {
       stats = 'Absent';
