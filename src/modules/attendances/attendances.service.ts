@@ -86,7 +86,7 @@ export class AttendancesService {
     let stats = '';
     if (filter.length >= 1) {
       if (time1 < time2 || diff === 0) {
-        stats = 'Present';
+        stats = 'Early';
       } else {
         stats = 'Late';
       }
