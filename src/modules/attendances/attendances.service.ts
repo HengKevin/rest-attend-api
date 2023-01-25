@@ -35,10 +35,8 @@ export class AttendancesService {
 
     const checkIn = filter[0].time;
     const checkOut = filter[filter.length - 1].time;
-    const filter0_id = filter[0].id;
-    const filter1_id = filter[filter.length - 1].id;
 
-    const updateUser = await this.prisma.users.update({
+    await this.prisma.users.update({
       where: { email: filter[0].userEmail },
       data: { checkIn: checkIn, checkOut: checkOut },
     });
@@ -84,10 +82,30 @@ export class AttendancesService {
     } else {
       stats = 'Absent';
     }
-    const updateUser = await this.prisma.users.update({
+    await this.prisma.users.update({
       where: { email: filter[0].userEmail },
       data: { attendanceStatus: stats },
     });
-    return stats;
+    const exist = await this.prisma.historicAtt.findMany({
+      where: {
+        AND: [{ date: date }, { userEmail: filter[0].userEmail }],
+      },
+    });
+    if (exist.length > 0) {
+      return stats;
+    } else {
+      await this.prisma.historicAtt.create({
+        data: {
+          date: date,
+          temperature: filter[0].temperature,
+          location: filter[0].location,
+          checkIn: checkIn,
+          checkOut: checkOut,
+          attendanceStatus: stats,
+          userEmail: filter[0].userEmail,
+        },
+      });
+      return stats;
+    }
   }
 }
