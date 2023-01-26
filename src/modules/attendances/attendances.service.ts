@@ -129,7 +129,7 @@ export class AttendancesService {
     if (exist.length > 0) {
       return stats;
     } else {
-      await this.prisma.historicAtt.create({
+      return await this.prisma.historicAtt.create({
         data: {
           date: date,
           temperature: filter[0].temperature,
@@ -140,7 +140,6 @@ export class AttendancesService {
           userEmail: filter[0].userEmail,
         },
       });
-      return stats;
     }
   }
 }

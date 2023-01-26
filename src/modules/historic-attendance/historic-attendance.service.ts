@@ -26,13 +26,14 @@ export class HistoricAttendanceService {
 
   async findAllByDate(date: string) {
     const students = await this.prisma.users.findMany();
-    students.forEach(async (student) => {
+    for (const student of students) {
       const exist = await this.findAllByDateAndEmail(date, student.email);
       if (!exist) {
         await this.markAbsentAttendance(date, student.email);
       }
-    });
-    return await this.prisma.historicAtt.findMany({ where: { date } });
+    }
+    const his = await this.prisma.historicAtt.findMany({ where: { date } });
+    return his;
   }
 
   async delete(id: number) {
@@ -40,7 +41,6 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocation(location: string) {
-    console.log(location);
     return await this.prisma.historicAtt.findMany({
       where: { location: location },
     });
