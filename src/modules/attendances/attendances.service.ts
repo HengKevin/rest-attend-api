@@ -88,7 +88,6 @@ export class AttendancesService {
   findAllByLocation(location: string) {
     return this.prisma.attendances.findMany({
       where: { location: location },
-      include: { user: { select: { name: true, email: true } } },
     });
   }
 

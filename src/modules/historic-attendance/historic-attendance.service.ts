@@ -18,6 +18,13 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.findMany({ where: { userEmail } });
   }
 
+  async findAllByDateAndEmail(date: string, userEmail: string) {
+    const res = await this.prisma.historicAtt.findMany({
+      where: { AND: [{ date: date }, { userEmail: userEmail }] },
+    });
+    return res;
+  }
+
   async findAllByDate(date: string) {
     const students = await this.prisma.users.findMany();
     students.forEach(async (student) => {
@@ -29,18 +36,15 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.findMany({ where: { date } });
   }
 
-  async findAllByDateAndEmail(date: string, userEmail: string) {
-    const res = await this.prisma.historicAtt.findMany({
-      where: { AND: [{ date: date }, { userEmail: userEmail }] },
-    });
-    return res;
-  }
   async delete(id: number) {
     return await this.prisma.historicAtt.delete({ where: { id } });
   }
 
   async findAllByLocation(location: string) {
-    return await this.prisma.historicAtt.findMany({ where: { location } });
+    console.log(location);
+    return await this.prisma.historicAtt.findMany({
+      where: { location: location },
+    });
   }
 
   async findOneByDateAndEmail(date: string, userEmail: string) {

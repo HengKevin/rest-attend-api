@@ -17,7 +17,12 @@ export class HistoricAttendanceController {
     return this.historicAttendanceService.findAll();
   }
 
-  @Get(':date')
+  @Get('/location/:location')
+  findAllByLocation(@Param('location') location: string) {
+    return this.historicAttendanceService.findAllByLocation(location);
+  }
+
+  @Get('/date/:date')
   findAllByDate(@Param('date') date: string) {
     return this.historicAttendanceService.findAllByDate(date);
   }
@@ -47,11 +52,6 @@ export class HistoricAttendanceController {
       date,
       userEmail,
     );
-  }
-
-  @Get(':location')
-  findAllByLocation(@Param('location') location: string) {
-    return this.historicAttendanceService.findAllByLocation(location);
   }
 
   @Post()
