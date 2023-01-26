@@ -50,4 +50,6 @@ model HistoricAtt {
     attendanceStatus String?
     user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
+
+    @@unique([date, userEmail])
 }
