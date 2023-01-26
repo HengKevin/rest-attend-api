@@ -8,7 +8,13 @@ import { AttendanceRuleModule } from './modules/attendance-rule/attendance-rule.
 import { HistoricAttendanceModule } from './modules/historic-attendance/historic-attendance.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AttendancesModule, AttendanceRuleModule, HistoricAttendanceModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AttendancesModule,
+    AttendanceRuleModule,
+    HistoricAttendanceModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
