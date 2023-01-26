@@ -49,6 +49,11 @@ export class HistoricAttendanceController {
     );
   }
 
+  @Get(':location')
+  findAllByLocation(@Param('location') location: string) {
+    return this.historicAttendanceService.findAllByLocation(location);
+  }
+
   @Post()
   create(@Body() historicAttendanceDto: HistoricAttDto) {
     return this.historicAttendanceService.create(historicAttendanceDto);

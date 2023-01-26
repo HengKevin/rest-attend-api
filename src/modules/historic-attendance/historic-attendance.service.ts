@@ -20,7 +20,6 @@ export class HistoricAttendanceService {
 
   async findAllByDate(date: string) {
     const students = await this.prisma.users.findMany();
-    // console.log(students);
     students.forEach(async (student) => {
       const exist = await this.findAllByDateAndEmail(date, student.email);
       if (exist.length === 0) {
@@ -38,6 +37,10 @@ export class HistoricAttendanceService {
   }
   async delete(id: number) {
     return await this.prisma.historicAtt.delete({ where: { id } });
+  }
+
+  async findAllByLocation(location: string) {
+    return await this.prisma.historicAtt.findMany({ where: { location } });
   }
 
   async findOneByDateAndEmail(date: string, userEmail: string) {
