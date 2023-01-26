@@ -12,7 +12,6 @@ export class AttendancesService {
       data: { ...attendance },
     });
     await this.calculateAttendance(attendance.date, attendance.userEmail);
-    await this.calculateAttendanceStatus(attendance.date, attendance.userEmail);
     return res;
   }
 
