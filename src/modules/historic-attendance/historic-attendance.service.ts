@@ -53,7 +53,7 @@ export class HistoricAttendanceService {
   }
 
   async markAbsentAttendance(date: string, userEmail: string) {
-    await this.prisma.historicAtt.create({
+    return await this.prisma.historicAtt.create({
       data: {
         date: date,
         temperature: 'undefined',
