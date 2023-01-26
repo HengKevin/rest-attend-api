@@ -38,6 +38,17 @@ export class HistoricAttendanceController {
     return this.historicAttendanceService.findAllByUserEmail(userEmail);
   }
 
+  @Get(':date/:userEmail')
+  findOneByDateAndEmail(
+    @Param('date') date: string,
+    @Param('userEmail') userEmail: string,
+  ) {
+    return this.historicAttendanceService.findOneByDateAndEmail(
+      date,
+      userEmail,
+    );
+  }
+
   @Post()
   create(@Body() historicAttendanceDto: HistoricAttDto) {
     return this.historicAttendanceService.create(historicAttendanceDto);

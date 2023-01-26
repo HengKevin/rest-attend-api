@@ -41,13 +41,39 @@ export class AttendancesService {
     const checkIn = filter[0].time;
     const checkOut = filter[filter.length - 1].time;
 
+    const rule = await this.prisma.attendanceRule.findMany();
+    const onDuty = rule[0].onDutyTime;
+    const lateMinute = rule[0].lateMinute;
+
+    const time1 = moment(checkIn, 'HH:mm');
+    const time2 = moment(onDuty, 'HH:mm').add(lateMinute, 'minutes');
+
+    const diff = time2.diff(time1, 'minutes');
+
+    let stats = '';
+    if (filter.length >= 1) {
+      if (time1 < time2 || diff === 0) {
+        stats = 'Early';
+      } else {
+        stats = 'Late';
+      }
+    } else {
+      stats = 'Absent';
+    }
+
     await this.prisma.users.update({
       where: { email: filter[0].userEmail },
       data: { checkIn: checkIn, checkOut: checkOut },
     });
     await this.prisma.historicAtt.updateMany({
       where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
-      data: { checkOut: checkOut },
+      data: {
+        checkIn: checkIn,
+        checkOut: checkOut,
+        attendanceStatus: stats,
+        temperature: filter[0].temperature,
+        location: filter[0].location,
+      },
     });
 
     return filter;

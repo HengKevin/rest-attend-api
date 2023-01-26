@@ -19,6 +19,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDate(date: string) {
+    const students = await this.prisma.users.findMany();
+    // console.log(students);
+    students.forEach(async (student) => {
+      const exist = await this.findAllByDateAndEmail(date, student.email);
+      if (exist.length === 0) {
+        await this.markAbsentAttendance(student.email);
+      }
+    });
     return await this.prisma.historicAtt.findMany({ where: { date } });
   }
 
@@ -30,5 +38,34 @@ export class HistoricAttendanceService {
   }
   async delete(id: number) {
     return await this.prisma.historicAtt.delete({ where: { id } });
+  }
+
+  async findOneByDateAndEmail(date: string, userEmail: string) {
+    return await this.prisma.attendances.findMany({
+      where: { AND: [{ date: date }, { userEmail: userEmail }] },
+    });
+  }
+
+  async markAbsentAttendance(userEmail: string) {
+    const currentDate = new Date();
+    const date = currentDate
+      .toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+      .split('/')
+      .join('-');
+    await this.prisma.historicAtt.create({
+      data: {
+        date: date,
+        temperature: 'undefined',
+        location: 'undefined',
+        checkIn: 'undefined',
+        checkOut: 'undefined',
+        attendanceStatus: 'Absent',
+        userEmail: userEmail,
+      },
+    });
   }
 }
