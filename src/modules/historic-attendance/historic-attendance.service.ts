@@ -25,13 +25,13 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDate(date: string) {
-    const students = await this.prisma.users.findMany();
-    for (const student of students) {
-      const exist = await this.findAllByDateAndEmail(date, student.email);
-      if (!exist) {
-        await this.markAbsentAttendance(date, student.email);
-      }
-    }
+    // const students = await this.prisma.users.findMany();
+    // for (const student of students) {
+    //   const exist = await this.findAllByDateAndEmail(date, student.email);
+    //   if (!exist) {
+    //     await this.markAbsentAttendance(date, student.email);
+    //   }
+    // }
     const his = await this.prisma.historicAtt.findMany({ where: { date } });
     return his;
   }
