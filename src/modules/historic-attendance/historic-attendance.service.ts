@@ -65,4 +65,22 @@ export class HistoricAttendanceService {
       },
     });
   }
+
+  async summaryByLocationDate(date: string, location: string) {
+    const res = await this.prisma.historicAtt.findMany({
+      where: { AND: [{ date: date }, { location: location }] },
+    });
+
+    const late = res.filter((item) => item.attendanceStatus === 'Late');
+    const unusual_temp = res.filter(
+      (item) => parseFloat(item.temperature) >= 37.5,
+    );
+    const summary = {
+      location: location,
+      total: res.length,
+      late: late.length,
+      unusual_temp: unusual_temp.length,
+    };
+    return summary;
+  }
 }

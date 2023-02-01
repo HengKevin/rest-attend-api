@@ -64,34 +64,46 @@ export class AttendancesService {
       where: { email: filter[0].userEmail },
       data: { checkIn: checkIn, checkOut: checkOut },
     });
-    await this.prisma.historicAtt.updateMany({
-      where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
-      data: {
-        checkIn: checkIn,
-        checkOut: checkOut,
-        attendanceStatus: stats,
-        temperature: filter[0].temperature,
-        location: filter[0].location,
-      },
-    });
+    if (filter.length > 1) {
+      await this.prisma.historicAtt.updateMany({
+        where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+        data: {
+          checkIn: checkIn,
+          checkOut: checkOut,
+          attendanceStatus: stats,
+          temperature: filter[filter.length - 1].temperature,
+          location: filter[0].location,
+        },
+      });
+    } else {
+      await this.prisma.historicAtt.updateMany({
+        where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+        data: {
+          checkIn: checkIn,
+          attendanceStatus: stats,
+          temperature: filter[0].temperature,
+          location: filter[0].location,
+        },
+      });
+    }
 
     return filter;
   }
 
-  findAllByLocationAndDate(location: string, date: string) {
-    return this.prisma.attendances.findMany({
+  async findAllByLocationAndDate(location: string, date: string) {
+    return await this.prisma.attendances.findMany({
       where: { AND: [{ location: location }, { date: date }] },
     });
   }
 
-  findAllByLocation(location: string) {
-    return this.prisma.attendances.findMany({
+  async findAllByLocation(location: string) {
+    return await this.prisma.attendances.findMany({
       where: { location: location },
     });
   }
 
-  deleteOne(id: number) {
-    return this.prisma.attendances.delete({ where: { id } });
+  async deleteOne(id: number) {
+    return await this.prisma.attendances.delete({ where: { id } });
   }
 
   async calculateAttendanceStatus(date: string, userEmail: string) {

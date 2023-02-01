@@ -38,6 +38,14 @@ export class HistoricAttendanceController {
     );
   }
 
+  @Get('/date/location/:date/:location')
+  summaryByLocationDate(
+    @Param('date') date: string,
+    @Param('location') location: string,
+  ) {
+    return this.historicAttendanceService.summaryByLocationDate(date, location);
+  }
+
   @Get(':userEmail')
   findAllByUserEmail(@Param('userEmail') userEmail: string) {
     return this.historicAttendanceService.findAllByUserEmail(userEmail);
