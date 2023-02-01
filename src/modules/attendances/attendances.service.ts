@@ -64,16 +64,28 @@ export class AttendancesService {
       where: { email: filter[0].userEmail },
       data: { checkIn: checkIn, checkOut: checkOut },
     });
-    await this.prisma.historicAtt.updateMany({
-      where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
-      data: {
-        checkIn: checkIn,
-        checkOut: checkOut,
-        attendanceStatus: stats,
-        temperature: filter[0].temperature,
-        location: filter[0].location,
-      },
-    });
+    if (filter.length > 1) {
+      await this.prisma.historicAtt.updateMany({
+        where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+        data: {
+          checkIn: checkIn,
+          checkOut: checkOut,
+          attendanceStatus: stats,
+          temperature: filter[filter.length - 1].temperature,
+          location: filter[0].location,
+        },
+      });
+    } else {
+      await this.prisma.historicAtt.updateMany({
+        where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+        data: {
+          checkIn: checkIn,
+          attendanceStatus: stats,
+          temperature: filter[0].temperature,
+          location: filter[0].location,
+        },
+      });
+    }
 
     return filter;
   }
