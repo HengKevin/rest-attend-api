@@ -1,13 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceDto } from './dto/attendance.dto';
+import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
 import * as moment from 'moment';
 
 @Injectable()
 export class AttendancesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private hist: HistoricAttendanceService,
+  ) {}
 
   async create(attendance: AttendanceDto) {
+    const students = await this.prisma.users.findMany();
+    for (const student of students) {
+      const exist = await this.hist.findAllByDateAndEmail(
+        attendance.date,
+        student.email,
+      );
+      if (!exist) {
+        await this.hist.markAbsentAttendance(attendance.date, student.email);
+      }
+    }
     const res = await this.prisma.attendances.create({
       data: { ...attendance },
     });
