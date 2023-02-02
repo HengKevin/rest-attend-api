@@ -75,14 +75,14 @@ export class HistoricAttendanceService {
         where: { AND: [{ date: date }, { location: loc.name }] },
       });
 
-      const late = res.filter((item) => item.attendanceStatus === 'Late');
+      const absent = res.filter((item) => item.attendanceStatus === 'Absent');
       const unusual_temp = res.filter(
         (item) => parseFloat(item.temperature) >= 37.5,
       );
       const summary = {
         location: loc.name,
         total: res.length,
-        late: late.length,
+        absent: absent.length,
         unusual_temp: unusual_temp.length,
       };
       summArr.push(summary);
