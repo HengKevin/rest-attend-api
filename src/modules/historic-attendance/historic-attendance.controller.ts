@@ -38,12 +38,9 @@ export class HistoricAttendanceController {
     );
   }
 
-  @Get('/date/location/:date/:location')
-  summaryByLocationDate(
-    @Param('date') date: string,
-    @Param('location') location: string,
-  ) {
-    return this.historicAttendanceService.summaryByLocationDate(date, location);
+  @Get('/attendance/location/date/:date')
+  summaryByLocationDate(@Param('date') date: string) {
+    return this.historicAttendanceService.summaryByLocationDate(date);
   }
 
   @Get(':userEmail')
