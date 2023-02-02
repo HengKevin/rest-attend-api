@@ -38,7 +38,7 @@ export class HistoricAttendanceController {
     );
   }
 
-  @Get('/attendance/date/:date')
+  @Get('/attendance/location/date/:date')
   summaryByLocationDate(@Param('date') date: string) {
     return this.historicAttendanceService.summaryByLocationDate(date);
   }

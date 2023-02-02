@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AttendancesService } from '../attendances/attendances.service';
+import { LocationService } from '../location/location.service';
 import { HistoricAttDto } from './dto/historic-attendance.dto';
 
 @Injectable()
 export class HistoricAttendanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private location: LocationService,
+  ) {}
 
   async create(history: HistoricAttDto) {
     return await this.prisma.historicAtt.create({ data: { ...history } });
@@ -61,21 +64,25 @@ export class HistoricAttendanceService {
   }
 
   async summaryByLocationDate(date: string) {
-    const location = 'Borey M49';
-    const res = await this.prisma.historicAtt.findMany({
-      where: { AND: [{ date: date }, { location: location }] },
-    });
+    const location = await this.location.findAll();
+    const summArr = [];
+    for (const loc of location) {
+      const res = await this.prisma.historicAtt.findMany({
+        where: { AND: [{ date: date }, { location: loc.name }] },
+      });
 
-    const late = res.filter((item) => item.attendanceStatus === 'Late');
-    const unusual_temp = res.filter(
-      (item) => parseFloat(item.temperature) >= 37.5,
-    );
-    const summary = {
-      location: location,
-      total: res.length,
-      late: late.length,
-      unusual_temp: unusual_temp.length,
-    };
-    return summary;
+      const late = res.filter((item) => item.attendanceStatus === 'Late');
+      const unusual_temp = res.filter(
+        (item) => parseFloat(item.temperature) >= 37.5,
+      );
+      const summary = {
+        location: loc.name,
+        total: res.length,
+        late: late.length,
+        unusual_temp: unusual_temp.length,
+      };
+      summArr.push(summary);
+    }
+    return summArr;
   }
 }
