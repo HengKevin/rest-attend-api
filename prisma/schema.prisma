@@ -53,3 +53,8 @@ model HistoricAtt {
 
     @@unique([date, userEmail])
 }
+
+model Location {
+    id      Int     @id @default(autoincrement())
+    name    String?
+}

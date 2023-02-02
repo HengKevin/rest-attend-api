@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AttendancesService } from '../attendances/attendances.service';
 import { HistoricAttDto } from './dto/historic-attendance.dto';
 
 @Injectable()
@@ -59,7 +60,8 @@ export class HistoricAttendanceService {
     });
   }
 
-  async summaryByLocationDate(date: string, location: string) {
+  async summaryByLocationDate(date: string) {
+    const location = 'Borey M49';
     const res = await this.prisma.historicAtt.findMany({
       where: { AND: [{ date: date }, { location: location }] },
     });

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AttendancesService } from '../attendances/attendances.service';
 import { HistoricAttendanceController } from './historic-attendance.controller';
 import { HistoricAttendanceService } from './historic-attendance.service';
 

@@ -6,6 +6,7 @@ import { AttendancesModule } from './modules/attendances/attendances.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AttendanceRuleModule } from './modules/attendance-rule/attendance-rule.module';
 import { HistoricAttendanceModule } from './modules/historic-attendance/historic-attendance.module';
+import { LocationModule } from './modules/location/location.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { HistoricAttendanceModule } from './modules/historic-attendance/historic
     AttendancesModule,
     AttendanceRuleModule,
     HistoricAttendanceModule,
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
