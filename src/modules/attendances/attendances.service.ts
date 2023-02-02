@@ -19,7 +19,11 @@ export class AttendancesService {
         student.email,
       );
       if (!exist) {
-        await this.hist.markAbsentAttendance(attendance.date, student.email);
+        await this.hist.markAbsentAttendance(
+          attendance.date,
+          student.email,
+          student.location,
+        );
       }
     }
     const res = await this.prisma.attendances.create({
@@ -86,7 +90,6 @@ export class AttendancesService {
           checkOut: checkOut,
           attendanceStatus: stats,
           temperature: filter[filter.length - 1].temperature,
-          location: filter[0].location,
         },
       });
     } else {
@@ -96,7 +99,6 @@ export class AttendancesService {
           checkIn: checkIn,
           attendanceStatus: stats,
           temperature: filter[0].temperature,
-          location: filter[0].location,
         },
       });
     }
