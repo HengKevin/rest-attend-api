@@ -12,6 +12,10 @@ export class UserDto {
 
   @IsString()
   @ApiProperty()
+  location: string;
+
+  @IsString()
+  @ApiProperty()
   faceString: string;
 
   @ApiProperty()

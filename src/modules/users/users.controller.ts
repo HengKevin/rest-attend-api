@@ -24,6 +24,12 @@ export class UsersController {
     return this.userService.create(userDto);
   }
 
+  @Get('location/users')
+  @ApiOkResponse({ type: User, isArray: true })
+  async findAllByLocation() {
+    return await this.userService.findAllByLocation();
+  }
+
   @Get()
   @ApiOkResponse({ type: User, isArray: true })
   async findAll() {

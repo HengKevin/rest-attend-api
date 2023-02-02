@@ -49,12 +49,16 @@ export class HistoricAttendanceService {
     });
   }
 
-  async markAbsentAttendance(date: string, userEmail: string) {
+  async markAbsentAttendance(
+    date: string,
+    userEmail: string,
+    location: string,
+  ) {
     return await this.prisma.historicAtt.create({
       data: {
         date: date,
         temperature: 'undefined',
-        location: 'undefined',
+        location: location,
         checkIn: 'undefined',
         checkOut: 'undefined',
         attendanceStatus: 'Absent',
