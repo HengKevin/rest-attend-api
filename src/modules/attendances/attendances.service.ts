@@ -62,6 +62,8 @@ export class AttendancesService {
     const onDuty = rule[0].onDutyTime;
     const lateMinute = rule[0].lateMinute;
 
+    const offDuty = rule[0].offDutyTime;
+
     const time1 = moment(checkIn, 'HH:mm');
     const time2 = moment(onDuty, 'HH:mm').add(lateMinute, 'minutes');
 
@@ -78,6 +80,16 @@ export class AttendancesService {
       stats = 'Absent';
     }
 
+    const offTime1 = moment(checkOut, 'HH:mm');
+    const offTime2 = moment(offDuty, 'HH:mm');
+
+    let offStats = '';
+    if (offTime1 < offTime2) {
+      offStats = 'Leave Early';
+    } else {
+      offStats = 'Leave On Time';
+    }
+
     await this.prisma.users.update({
       where: { email: filter[0].userEmail },
       data: { checkIn: checkIn, checkOut: checkOut },
@@ -89,6 +101,7 @@ export class AttendancesService {
           checkIn: checkIn,
           checkOut: checkOut,
           attendanceStatus: stats,
+          checkOutStatus: offStats,
           temperature: filter[filter.length - 1].temperature,
         },
       });
@@ -120,54 +133,5 @@ export class AttendancesService {
 
   async deleteOne(id: number) {
     return await this.prisma.attendances.delete({ where: { id } });
-  }
-
-  async calculateAttendanceStatus(date: string, userEmail: string) {
-    const filter = await this.findAllByDateAndEmail(date, userEmail);
-    const rule = await this.prisma.attendanceRule.findMany();
-    const onDuty = rule[0].onDutyTime;
-    const lateMinute = rule[0].lateMinute;
-    const checkIn = filter[0].time;
-    const checkOut = filter[filter.length - 1].time;
-
-    const time1 = moment(checkIn, 'HH:mm');
-    const time2 = moment(onDuty, 'HH:mm').add(lateMinute, 'minutes');
-
-    const diff = time2.diff(time1, 'minutes');
-
-    let stats = '';
-    if (filter.length >= 1) {
-      if (time1 < time2 || diff === 0) {
-        stats = 'Early';
-      } else {
-        stats = 'Late';
-      }
-    } else {
-      stats = 'Absent';
-    }
-    await this.prisma.users.update({
-      where: { email: filter[0].userEmail },
-      data: { attendanceStatus: stats },
-    });
-    const exist = await this.prisma.historicAtt.findMany({
-      where: {
-        AND: [{ date: date }, { userEmail: filter[0].userEmail }],
-      },
-    });
-    if (exist.length > 0) {
-      return stats;
-    } else {
-      return await this.prisma.historicAtt.create({
-        data: {
-          date: date,
-          temperature: filter[0].temperature,
-          location: filter[0].location,
-          checkIn: checkIn,
-          checkOut: checkOut,
-          attendanceStatus: stats,
-          userEmail: filter[0].userEmail,
-        },
-      });
-    }
   }
 }

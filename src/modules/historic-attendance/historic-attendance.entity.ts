@@ -15,6 +15,9 @@ export class HistoricEntity implements HistoricAtt {
   attendanceStatus: string;
 
   @ApiProperty()
+  checkOutStatus: string;
+
+  @ApiProperty()
   userEmail: string;
 
   @ApiProperty()
