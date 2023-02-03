@@ -60,7 +60,7 @@ export class HistoricAttendanceService {
         temperature: 'undefined',
         location: location,
         checkIn: 'undefined',
-        checkOut: 'undefined',
+        checkOut: '--:--',
         attendanceStatus: 'Absent',
         userEmail: userEmail,
       },
@@ -88,5 +88,28 @@ export class HistoricAttendanceService {
       summArr.push(summary);
     }
     return summArr;
+  }
+
+  async filterStatusByLocationDate(
+    date?: string,
+    location?: string,
+    status?: string,
+  ) {
+    const res = await this.prisma.historicAtt.findMany({
+      where: {
+        AND: [
+          { date: date },
+          { attendanceStatus: status },
+          { location: location },
+        ],
+      },
+    });
+    return res;
+  }
+
+  async findAllByLocationDate(location: string, date: string) {
+    return await this.prisma.historicAtt.findMany({
+      where: { AND: [{ location: location }, { date: date }] },
+    });
   }
 }
