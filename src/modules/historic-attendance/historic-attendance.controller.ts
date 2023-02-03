@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { Body, Delete, Param, Post } from '@nestjs/common/decorators';
+import { Body, Delete, Param, Post, Query } from '@nestjs/common/decorators';
 import { ParseIntPipe } from '@nestjs/common/pipes';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { HistoricAttDto } from './dto/historic-attendance.dto';
 import { HistoricAttendanceService } from './historic-attendance.service';
 
@@ -36,6 +36,31 @@ export class HistoricAttendanceController {
       date,
       userEmail,
     );
+  }
+
+  @Get('/location/date/status')
+  @ApiQuery({ name: 'date', required: false })
+  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'status', required: false })
+  findAllByLocationDateStatus(
+    @Query('date') date?: string,
+    @Query('location') location?: string,
+    @Query('status') status?: string,
+  ) {
+    if (date && location && status) {
+      return this.historicAttendanceService.filterStatusByLocationDate(
+        date,
+        location,
+        status,
+      );
+    } else if (date && location) {
+      return this.historicAttendanceService.findAllByLocationDate(
+        location,
+        date,
+      );
+    } else {
+      return this.historicAttendanceService.findAllByDate(date);
+    }
   }
 
   @Get('/attendance/location/date/:date')
