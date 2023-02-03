@@ -15,6 +15,10 @@ export class HistoricAttDto {
   attendanceStatus: string;
 
   @IsString()
+  @ApiProperty({ required: false })
+  checkOutStatus: string;
+
+  @IsString()
   @ApiProperty()
   userEmail: string;
 

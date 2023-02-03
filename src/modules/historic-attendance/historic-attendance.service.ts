@@ -59,9 +59,10 @@ export class HistoricAttendanceService {
         date: date,
         temperature: 'undefined',
         location: location,
-        checkIn: 'undefined',
+        checkIn: '--:--',
         checkOut: '--:--',
         attendanceStatus: 'Absent',
+        checkOutStatus: 'undefined',
         userEmail: userEmail,
       },
     });

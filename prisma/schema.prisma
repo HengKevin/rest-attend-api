@@ -14,7 +14,6 @@ model Users {
     faceString       String
     checkIn          String?
     checkOut         String?
-    attendanceStatus String?
     location         String?
     createdAt        DateTime      @default(now())
     attendances      Attendances[]
@@ -49,6 +48,7 @@ model HistoricAtt {
     checkIn     String?
     checkOut    String?
     attendanceStatus String?
+    checkOutStatus String?
     user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
 
