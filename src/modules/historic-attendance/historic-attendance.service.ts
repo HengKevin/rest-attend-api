@@ -14,8 +14,8 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.create({ data: { ...history } });
   }
 
-  async findAll() {
-    return await this.prisma.historicAtt.findMany();
+  async findAll(skip?: number, take?: number) {
+    return await this.prisma.historicAtt.findMany({ skip, take });
   }
 
   async findAllByUserEmail(userEmail: string) {
@@ -28,8 +28,12 @@ export class HistoricAttendanceService {
     });
   }
 
-  async findAllByDate(date: string) {
-    const his = await this.prisma.historicAtt.findMany({ where: { date } });
+  async findAllByDate(date: string, skip?: number, take?: number) {
+    const his = await this.prisma.historicAtt.findMany({
+      where: { date },
+      skip,
+      take,
+    });
     return his;
   }
 
@@ -95,6 +99,8 @@ export class HistoricAttendanceService {
     date?: string,
     location?: string,
     status?: string,
+    skip?: number,
+    take?: number,
   ) {
     const res = await this.prisma.historicAtt.findMany({
       where: {
@@ -104,13 +110,22 @@ export class HistoricAttendanceService {
           { location: location },
         ],
       },
+      skip,
+      take,
     });
     return res;
   }
 
-  async findAllByLocationDate(location: string, date: string) {
+  async findAllByLocationDate(
+    location: string,
+    date: string,
+    skip?: number,
+    take?: number,
+  ) {
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { date: date }] },
+      skip,
+      take,
     });
   }
 }
