@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AttendanceRuleModule } from './modules/attendance-rule/attendance-rule.module';
 import { HistoricAttendanceModule } from './modules/historic-attendance/historic-attendance.module';
 import { LocationModule } from './modules/location/location.module';
+import { ExcelModule } from './modules/excel/excel.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminsModule } from './modules/admins/admins.module';
 
@@ -18,6 +19,7 @@ import { AdminsModule } from './modules/admins/admins.module';
     AttendanceRuleModule,
     HistoricAttendanceModule,
     LocationModule,
+    ExcelModule,
     AuthModule,
     AdminsModule,
   ],

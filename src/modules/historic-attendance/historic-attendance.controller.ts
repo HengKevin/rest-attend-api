@@ -1,9 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
 import { Body, Delete, Param, Post, Query } from '@nestjs/common/decorators';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { HistoricAttDto } from './dto/historic-attendance.dto';
 import { HistoricAttendanceService } from './historic-attendance.service';
+import { Response } from 'express';
+import * as fs from 'fs';
 
 @Controller('historic-attendance')
 @ApiTags('historic-attendance')
@@ -101,6 +103,30 @@ export class HistoricAttendanceController {
     );
   }
 
+  @Get('/attendance/excel/:date')
+  @ApiQuery({ name: 'date', required: false })
+  async excel(@Query('date') date: string, @Res() res: Response) {
+    const exportPath = await this.historicAttendanceService.exportDataByDate(
+      date,
+    );
+
+    fs.promises
+      .stat(exportPath)
+      .then((stat) => {
+        if (stat.isFile()) {
+          res.download(exportPath, 'attendance.xlsx', (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              fs.unlinkSync(exportPath);
+            }
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
   @Post()
   create(@Body() historicAttendanceDto: HistoricAttDto) {
     return this.historicAttendanceService.create(historicAttendanceDto);
