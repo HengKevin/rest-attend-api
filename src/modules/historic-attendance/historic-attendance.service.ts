@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ExcelService } from '../excel/excel.service';
 import { LocationService } from '../location/location.service';
 import { HistoricAttDto } from './dto/historic-attendance.dto';
 
@@ -8,6 +9,7 @@ export class HistoricAttendanceService {
   constructor(
     private prisma: PrismaService,
     private location: LocationService,
+    private excel: ExcelService,
   ) {}
 
   async create(history: HistoricAttDto) {
@@ -127,5 +129,13 @@ export class HistoricAttendanceService {
       skip,
       take,
     });
+  }
+
+  async exportDataByDate(date: string) {
+    const data = await this.prisma.historicAtt.findMany({
+      where: { date: date },
+    });
+    const res = await this.excel.dowloadExcel(data);
+    return res;
   }
 }

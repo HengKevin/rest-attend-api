@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AttendanceRuleModule } from './modules/attendance-rule/attendance-rule.module';
 import { HistoricAttendanceModule } from './modules/historic-attendance/historic-attendance.module';
 import { LocationModule } from './modules/location/location.module';
+import { ExcelModule } from './modules/excel/excel.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LocationModule } from './modules/location/location.module';
     AttendanceRuleModule,
     HistoricAttendanceModule,
     LocationModule,
+    ExcelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
