@@ -8,6 +8,8 @@ import { AttendanceRuleModule } from './modules/attendance-rule/attendance-rule.
 import { HistoricAttendanceModule } from './modules/historic-attendance/historic-attendance.module';
 import { LocationModule } from './modules/location/location.module';
 import { ExcelModule } from './modules/excel/excel.module';
+import { AuthModule } from './auth/auth.module';
+import { AdminsModule } from './modules/admins/admins.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ExcelModule } from './modules/excel/excel.module';
     HistoricAttendanceModule,
     LocationModule,
     ExcelModule,
+    AuthModule,
+    AdminsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
