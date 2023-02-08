@@ -3,12 +3,26 @@ import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationService } from '../location/location.service';
 
+export type Admin = any;
 @Injectable()
 export class UsersService {
   constructor(
     private prisma: PrismaService,
     private location: LocationService,
   ) {}
+
+  private readonly admins = [
+    {
+      userId: 1,
+      email: 'ouk.sovannratana19@kit.edu.kh',
+      password: 'password',
+    },
+    {
+      userId: 2,
+      email: 'heng.kevin19@kit.edu.kh',
+      password: 'password',
+    },
+  ];
 
   async create(user: UserDto) {
     return await this.prisma.users.create({ data: user });
@@ -20,6 +34,12 @@ export class UsersService {
 
   async findOne(email: string) {
     return await this.prisma.users.findUnique({ where: { email } });
+  }
+
+  async findAdminByEmail(email: string): Promise<Admin | undefined> {
+    const foundAdmin = this.admins.find((admin) => admin.email === email);
+    console.log(foundAdmin);
+    return foundAdmin;
   }
 
   async findAllByLocation() {
