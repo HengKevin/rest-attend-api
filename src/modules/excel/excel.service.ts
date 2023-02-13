@@ -56,9 +56,9 @@ export class ExcelService {
     const worksheet = workbook.addWorksheet(location);
 
     worksheet.columns = [
-      { header: 'Date', key: 'date', width: 20 },
-      { header: 'Name', key: 'name', width: 10 },
-      { header: 'Email', key: 'email', width: 20 },
+      { header: 'Date', key: 'date', width: 30 },
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Email', key: 'email', width: 30 },
       { header: 'Early', key: 'early', width: 10 },
       { header: 'Late', key: 'late', width: 10 },
       { header: 'Absent', key: 'absent', width: 10 },
