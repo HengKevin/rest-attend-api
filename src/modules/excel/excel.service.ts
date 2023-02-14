@@ -44,4 +44,34 @@ export class ExcelService {
     await workbook.xlsx.writeFile(exportPath);
     return exportPath;
   }
+
+  async downloadExcelByLocation(
+    data: Historic[],
+    location: string,
+  ): Promise<string> {
+    if (!data) {
+      throw new NotFoundException('No data found');
+    }
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet(location);
+
+    worksheet.columns = [
+      { header: 'Date', key: 'date', width: 30 },
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Early', key: 'early', width: 10 },
+      { header: 'Late', key: 'late', width: 10 },
+      { header: 'Absent', key: 'absent', width: 10 },
+    ];
+
+    for (const item of data) {
+      worksheet.addRow({
+        ...item,
+      });
+    }
+
+    const exportPath = path.resolve(__dirname, location + '.xlsx');
+    await workbook.xlsx.writeFile(exportPath);
+    return exportPath;
+  }
 }

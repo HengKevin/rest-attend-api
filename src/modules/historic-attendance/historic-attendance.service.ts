@@ -138,4 +138,58 @@ export class HistoricAttendanceService {
     const res = await this.excel.dowloadExcel(data);
     return res;
   }
+
+  async exportDataByLocationDateRange(
+    startDate: string,
+    endDate: string,
+    location: string,
+  ) {
+    const data = [];
+    const users = await this.prisma.users.findMany();
+    for (const user of users) {
+      const early = await this.prisma.historicAtt.count({
+        where: {
+          AND: [
+            { attendanceStatus: 'Early' },
+            { date: { gte: startDate } },
+            { date: { lte: endDate } },
+            { userEmail: user.email },
+            { location: location },
+          ],
+        },
+      });
+      const late = await this.prisma.historicAtt.count({
+        where: {
+          AND: [
+            { attendanceStatus: 'Late' },
+            { date: { gte: startDate } },
+            { date: { lte: endDate } },
+            { userEmail: user.email },
+            { location: location },
+          ],
+        },
+      });
+      const absent = await this.prisma.historicAtt.count({
+        where: {
+          AND: [
+            { attendanceStatus: 'Absent' },
+            { date: { gte: startDate } },
+            { date: { lte: endDate } },
+            { userEmail: user.email },
+            { location: location },
+          ],
+        },
+      });
+      data.push({
+        date: startDate + ' - ' + endDate,
+        name: user.name,
+        email: user.email,
+        early: early,
+        late: late,
+        absent: absent,
+      });
+    }
+    const res = await this.excel.downloadExcelByLocation(data, location);
+    return res;
+  }
 }

@@ -103,6 +103,41 @@ export class HistoricAttendanceController {
     );
   }
 
+  @Get('/attendance/excel/location/date')
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  @ApiQuery({ name: 'location', required: false })
+  async excelByLocationDate(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('location') location: string,
+    @Res() res: Response,
+  ) {
+    const exportPath =
+      await this.historicAttendanceService.exportDataByLocationDateRange(
+        startDate,
+        endDate,
+        location,
+      );
+
+    fs.promises
+      .stat(exportPath)
+      .then((stat) => {
+        if (stat.isFile()) {
+          res.download(exportPath, location + '.xlsx', (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              fs.unlinkSync(exportPath);
+            }
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
   @Get('/attendance/excel/:date')
   @ApiQuery({ name: 'date', required: false })
   async excel(@Query('date') date: string, @Res() res: Response) {
