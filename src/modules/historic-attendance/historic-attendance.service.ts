@@ -145,7 +145,9 @@ export class HistoricAttendanceService {
     location: string,
   ) {
     const data = [];
-    const users = await this.prisma.users.findMany();
+    const users = await this.prisma.users.findMany({
+      where: { location: location },
+    });
     for (const user of users) {
       const early = await this.prisma.historicAtt.count({
         where: {
