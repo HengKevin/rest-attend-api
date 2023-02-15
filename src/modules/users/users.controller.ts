@@ -24,6 +24,12 @@ export class UsersController {
     return this.userService.create(userDto);
   }
 
+  @Post('/bulk/create')
+  @ApiCreatedResponse({ type: User, isArray: true })
+  async bulkCreate(@Body() userDto: UserDto[]) {
+    return await this.userService.bulkCreate(userDto);
+  }
+
   @Get('location/users')
   @ApiOkResponse({ type: User, isArray: true })
   async findAllByLocation() {

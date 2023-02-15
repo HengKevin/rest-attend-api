@@ -28,8 +28,25 @@ export class UsersService {
     return await this.prisma.users.create({ data: user });
   }
 
-  async findAll() {
-    return await this.prisma.users.findMany();
+  async bulkCreate(users: UserDto[]) {
+    return await this.prisma.users.createMany({ data: users });
+  }
+
+  async findAll(page = 1) {
+    const total = await this.prisma.users.count();
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.users.findMany({
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        dataPerPage: total / pages,
+      },
+    };
   }
 
   async findOne(email: string) {
@@ -45,7 +62,7 @@ export class UsersService {
   async findAllByLocation() {
     const locations = await this.location.findAll();
     const userArr = [];
-    for (const loc of locations) {
+    for (const loc of locations.data) {
       const total = await this.prisma.users.count({
         where: { location: loc.name },
       });
