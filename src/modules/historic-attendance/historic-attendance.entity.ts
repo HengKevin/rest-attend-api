@@ -9,7 +9,7 @@ export class HistoricEntity implements HistoricAtt {
   date: string;
 
   @ApiProperty()
-  temperature: string;
+  name: string;
 
   @ApiProperty()
   attendanceStatus: string;

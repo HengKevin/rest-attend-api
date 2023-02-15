@@ -85,7 +85,6 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.create({
       data: {
         date: date,
-        temperature: 'undefined',
         location: location,
         checkIn: '--:--',
         checkOut: '--:--',
@@ -105,14 +104,10 @@ export class HistoricAttendanceService {
       });
 
       const absent = res.filter((item) => item.attendanceStatus === 'Absent');
-      const unusual_temp = res.filter(
-        (item) => parseFloat(item.temperature) >= 37.5,
-      );
       const summary = {
         location: loc.name,
         total: res.length,
         absent: absent.length,
-        unusual_temp: unusual_temp.length,
       };
       summArr.push(summary);
     }

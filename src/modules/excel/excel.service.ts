@@ -5,7 +5,6 @@ import * as path from 'path';
 interface Historic {
   id: number;
   date: string;
-  temperature: string;
   location: string;
   checkIn: string;
   checkOut: string;
@@ -26,7 +25,6 @@ export class ExcelService {
     worksheet.columns = [
       { header: 'ID', key: 'id', width: 10 },
       { header: 'Date', key: 'date', width: 20 },
-      { header: 'Temperature', key: 'temperature', width: 20 },
       { header: 'Location', key: 'location', width: 20 },
       { header: 'Check In', key: 'checkIn', width: 20 },
       { header: 'Check Out', key: 'checkOut', width: 20 },

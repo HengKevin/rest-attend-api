@@ -32,12 +32,11 @@ model Attendances {
     id          Int      @id @default(autoincrement())
     createdAt   DateTime @default(now())
     date        String?
-    temperature String?
-    status      String?
     location    String?
     time        String?
     user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
+    name        String?
 }
 
 model AttendanceRule {
@@ -51,7 +50,6 @@ model AttendanceRule {
 model HistoricAtt {
     id          Int      @id @default(autoincrement())
     date        String?
-    temperature String?
     location    String?
     checkIn     String?
     checkOut    String?
@@ -59,6 +57,7 @@ model HistoricAtt {
     checkOutStatus String?
     user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
+    name        String?
 
     @@unique([date, userEmail])
 }

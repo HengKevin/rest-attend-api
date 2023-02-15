@@ -102,7 +102,6 @@ export class AttendancesService {
           checkOut: checkOut,
           attendanceStatus: stats,
           checkOutStatus: offStats,
-          temperature: filter[filter.length - 1].temperature,
         },
       });
     } else {
@@ -111,7 +110,6 @@ export class AttendancesService {
         data: {
           checkIn: checkIn,
           attendanceStatus: stats,
-          temperature: filter[0].temperature,
         },
       });
     }

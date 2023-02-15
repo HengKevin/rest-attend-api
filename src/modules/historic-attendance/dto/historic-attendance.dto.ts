@@ -8,10 +8,6 @@ export class HistoricAttDto {
 
   @IsString()
   @ApiProperty({ required: false })
-  temperature: string;
-
-  @IsString()
-  @ApiProperty({ required: false })
   attendanceStatus: string;
 
   @IsString()
