@@ -81,6 +81,7 @@ export class HistoricAttendanceService {
     date: string,
     userEmail: string,
     location: string,
+    name: string,
   ) {
     return await this.prisma.historicAtt.create({
       data: {
@@ -91,6 +92,7 @@ export class HistoricAttendanceService {
         attendanceStatus: 'Absent',
         checkOutStatus: 'undefined',
         userEmail: userEmail,
+        name: name,
       },
     });
   }

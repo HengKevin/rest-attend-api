@@ -23,6 +23,7 @@ export class AttendancesService {
           attendance.date,
           student.email,
           student.location,
+          student.name,
         );
       }
     }
