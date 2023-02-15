@@ -98,7 +98,7 @@ export class HistoricAttendanceService {
   async summaryByLocationDate(date: string) {
     const location = await this.location.findAll();
     const summArr = [];
-    for (const loc of location.data) {
+    for (const loc of location) {
       const res = await this.prisma.historicAtt.findMany({
         where: { AND: [{ date: date }, { location: loc.name }] },
       });
