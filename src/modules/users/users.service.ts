@@ -32,7 +32,11 @@ export class UsersService {
     return await this.prisma.users.createMany({ data: users });
   }
 
-  async findAll(page = 1) {
+  async findAll() {
+    return await this.prisma.users.findMany();
+  }
+
+  async findAllPage(page = 1) {
     const total = await this.prisma.users.count();
     const pages = Math.ceil(total / 10);
     const res = await this.prisma.users.findMany({
@@ -62,7 +66,7 @@ export class UsersService {
   async findAllByLocation() {
     const locations = await this.location.findAll();
     const userArr = [];
-    for (const loc of locations.data) {
+    for (const loc of locations) {
       const total = await this.prisma.users.count({
         where: { location: loc.name },
       });

@@ -16,7 +16,11 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.create({ data: { ...history } });
   }
 
-  async findAll(page = 1) {
+  async findAll() {
+    return await this.prisma.historicAtt.findMany();
+  }
+
+  async findAllPage(page = 1) {
     const total = await this.prisma.historicAtt.count();
     const pages = Math.ceil(total / 10);
     const res = await this.prisma.historicAtt.findMany({
@@ -28,7 +32,7 @@ export class HistoricAttendanceService {
       pagination: {
         totalData: total,
         totalPages: pages,
-        dataPerPage: total / pages,
+        dataPerPage: 10,
       },
     };
   }
@@ -99,7 +103,7 @@ export class HistoricAttendanceService {
   async summaryByLocationDate(date: string) {
     const location = await this.location.findAll();
     const summArr = [];
-    for (const loc of location.data) {
+    for (const loc of location) {
       const res = await this.prisma.historicAtt.findMany({
         where: { AND: [{ date: date }, { location: loc.name }] },
       });

@@ -10,7 +10,11 @@ export class LocationService {
     return await this.prisma.location.create({ data: { ...location } });
   }
 
-  async findAll(page = 1) {
+  async findAll() {
+    return await this.prisma.location.findMany();
+  }
+
+  async findAllPage(page = 1) {
     const total = await this.prisma.location.count();
     const pages = Math.ceil(total / 10);
     const res = await this.prisma.location.findMany({

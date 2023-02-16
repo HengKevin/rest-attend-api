@@ -15,9 +15,14 @@ export class HistoricAttendanceController {
   ) {}
 
   @Get()
+  async findAll() {
+    return await this.historicAttendanceService.findAll();
+  }
+
+  @Get('/v2')
   @ApiQuery({ name: 'page', required: false })
-  async findAll(@Query('page') page) {
-    return await this.historicAttendanceService.findAll(page);
+  async findAllPage(@Query('page') page: number) {
+    return await this.historicAttendanceService.findAllPage(page);
   }
 
   @Get('/location/:location')
