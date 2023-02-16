@@ -58,7 +58,7 @@ model AttendanceRule {
 model HistoricAtt {
     id               Int     @id @default(autoincrement())
     date             String?
-    location         String?
+    level            String?
     checkIn          String?
     checkOut         String?
     temperature      String?
@@ -72,6 +72,11 @@ model HistoricAtt {
 }
 
 model Location {
+    id   Int     @id @default(autoincrement())
+    name String?
+}
+
+model level {
     id   Int     @id @default(autoincrement())
     name String?
 }

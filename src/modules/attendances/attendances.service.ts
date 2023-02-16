@@ -16,7 +16,7 @@ export class AttendancesService {
     for (const student of students) {
       const exist = await this.hist.findAllByDateAndId(
         attendance.date,
-        student.email,
+        student.id,
       );
       if (!exist) {
         await this.hist.markAbsentAttendance(

@@ -37,9 +37,9 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.findMany({ where: { id } });
   }
 
-  async findAllByDateAndId(date: string, id: string) {
+  async findAllByDateAndId(date: string, id: number) {
     return await this.prisma.historicAtt.findUnique({
-      where: { AND: [{ date: date }, { id: id }] },
+      where: { date_userId: { date: date, userId: id } },
     });
   }
 
@@ -65,9 +65,9 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.delete({ where: { id } });
   }
 
-  async findAllByLocation(location: string) {
+  async findAllByLocation(level: string) {
     return await this.prisma.historicAtt.findMany({
-      where: { location: location },
+      where: { level: level },
     });
   }
 
@@ -79,31 +79,31 @@ export class HistoricAttendanceService {
 
   async markAbsentAttendance(
     date: string,
-    userEmail: string,
-    location: string,
+    userId: number,
+    level: string,
     name: string,
   ) {
     return await this.prisma.historicAtt.create({
       data: {
         date: date,
-        location: location,
+        level: level,
         checkIn: '--:--',
         checkOut: '--:--',
         temperature: '0',
         attendanceStatus: 'Absent',
         checkOutStatus: 'undefined',
-        userEmail: userEmail,
+        userId: userId,
         name: name,
       },
     });
   }
 
   async summaryByLocationDate(date: string) {
-    const location = await this.location.findAll();
+    const level = await this.location.findAll();
     const summArr = [];
-    for (const loc of location) {
+    for (const loc of level) {
       const res = await this.prisma.historicAtt.findMany({
-        where: { AND: [{ date: date }, { location: loc.name }] },
+        where: { AND: [{ date: date }, { level: loc.name }] },
       });
 
       const absent = res.filter((item) => item.attendanceStatus === 'Absent');
@@ -119,7 +119,7 @@ export class HistoricAttendanceService {
 
   async filterStatusByLocationDate(
     date?: string,
-    location?: string,
+    level?: string,
     status?: string,
     page = 1,
   ) {
@@ -129,11 +129,7 @@ export class HistoricAttendanceService {
     const pages = Math.ceil(total / 10);
     const res = await this.prisma.historicAtt.findMany({
       where: {
-        AND: [
-          { date: date },
-          { attendanceStatus: status },
-          { location: location },
-        ],
+        AND: [{ date: date }, { attendanceStatus: status }, { level: level }],
       },
       take: 10,
       skip: 10 * (page - 1),
@@ -148,9 +144,9 @@ export class HistoricAttendanceService {
     };
   }
 
-  async findAllByLocationDate(location: string, date: string, page = 1) {
+  async findAllByLevelDate(level: string, date: string, page = 1) {
     return await this.prisma.historicAtt.findMany({
-      where: { AND: [{ location: location }, { date: date }] },
+      where: { AND: [{ level: level }, { date: date }] },
       take: 10,
       skip: 10 * (page - 1),
     });
@@ -167,11 +163,11 @@ export class HistoricAttendanceService {
   async exportDataByLocationDateRange(
     startDate: string,
     endDate: string,
-    location: string,
+    level: string,
   ) {
     const data = [];
     const users = await this.prisma.users.findMany({
-      where: { location: location },
+      where: { level: level },
     });
     for (const user of users) {
       const early = await this.prisma.historicAtt.count({
@@ -180,8 +176,8 @@ export class HistoricAttendanceService {
             { attendanceStatus: 'Early' },
             { date: { gte: startDate } },
             { date: { lte: endDate } },
-            { userEmail: user.email },
-            { location: location },
+            { userId: user.id },
+            { level: level },
           ],
         },
       });
@@ -191,8 +187,8 @@ export class HistoricAttendanceService {
             { attendanceStatus: 'Late' },
             { date: { gte: startDate } },
             { date: { lte: endDate } },
-            { userEmail: user.email },
-            { location: location },
+            { userId: user.id },
+            { level: level },
           ],
         },
       });
@@ -202,21 +198,21 @@ export class HistoricAttendanceService {
             { attendanceStatus: 'Absent' },
             { date: { gte: startDate } },
             { date: { lte: endDate } },
-            { userEmail: user.email },
-            { location: location },
+            { userId: user.id },
+            { level: level },
           ],
         },
       });
       data.push({
         date: startDate + ' - ' + endDate,
         name: user.name,
-        email: user.email,
+        id: user.id,
         early: early,
         late: late,
         absent: absent,
       });
     }
-    const res = await this.excel.downloadExcelByLocation(data, location);
+    const res = await this.excel.downloadExcelByLocation(data, level);
     return res;
   }
 }

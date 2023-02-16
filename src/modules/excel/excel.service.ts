@@ -5,12 +5,13 @@ import * as path from 'path';
 interface Historic {
   id: number;
   date: string;
-  location: string;
+  level: string;
   checkIn: string;
   checkOut: string;
   attendanceStatus: string;
   checkOutStatus: string;
-  userEmail: string;
+  userId: number;
+  name: string;
 }
 
 @Injectable()
@@ -25,12 +26,13 @@ export class ExcelService {
     worksheet.columns = [
       { header: 'ID', key: 'id', width: 10 },
       { header: 'Date', key: 'date', width: 20 },
-      { header: 'Location', key: 'location', width: 20 },
+      { header: 'Level', key: 'level', width: 20 },
       { header: 'Check In', key: 'checkIn', width: 20 },
       { header: 'Check Out', key: 'checkOut', width: 20 },
       { header: 'Attendance Status', key: 'attendanceStatus', width: 20 },
       { header: 'Check Out Status', key: 'checkOutStatus', width: 20 },
-      { header: 'User Email', key: 'userEmail', width: 20 },
+      { header: 'ID', key: 'userId', width: 20 },
+      { header: 'Name', key: 'name', width: 20 },
     ];
     for (const item of data) {
       worksheet.addRow({
@@ -45,13 +47,13 @@ export class ExcelService {
 
   async downloadExcelByLocation(
     data: Historic[],
-    location: string,
+    level: string,
   ): Promise<string> {
     if (!data) {
       throw new NotFoundException('No data found');
     }
     const workbook = new Workbook();
-    const worksheet = workbook.addWorksheet(location);
+    const worksheet = workbook.addWorksheet(level);
 
     worksheet.columns = [
       { header: 'Date', key: 'date', width: 30 },
@@ -68,7 +70,7 @@ export class ExcelService {
       });
     }
 
-    const exportPath = path.resolve(__dirname, location + '.xlsx');
+    const exportPath = path.resolve(__dirname, level + '.xlsx');
     await workbook.xlsx.writeFile(exportPath);
     return exportPath;
   }

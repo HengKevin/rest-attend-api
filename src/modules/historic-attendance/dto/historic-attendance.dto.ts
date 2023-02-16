@@ -24,7 +24,7 @@ export class HistoricAttDto {
 
   @IsString()
   @ApiProperty({ required: false })
-  location: string;
+  level: string;
 
   @IsString()
   @ApiProperty({ required: false })

@@ -24,7 +24,7 @@ export class HistoricEntity implements HistoricAtt {
   userId: number;
 
   @ApiProperty()
-  location: string;
+  level: string;
 
   @ApiProperty()
   checkIn: string;
