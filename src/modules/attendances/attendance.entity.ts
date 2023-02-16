@@ -15,6 +15,9 @@ export class AttendanceEntity implements Attendances {
   userEmail: string;
 
   @ApiProperty()
+  temperature: string;
+
+  @ApiProperty()
   name: string;
 
   @ApiProperty()

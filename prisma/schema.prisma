@@ -34,6 +34,7 @@ model Attendances {
     date        String?
     location    String?
     time        String?
+    temperature String?
     user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
     userEmail   String
     name        String?
@@ -53,6 +54,7 @@ model HistoricAtt {
     location    String?
     checkIn     String?
     checkOut    String?
+    temperature String?
     attendanceStatus String?
     checkOutStatus String?
     user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
