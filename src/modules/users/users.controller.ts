@@ -7,8 +7,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity as User } from './user.entity';
 import { UserDto } from './dto/user.dto';
@@ -24,6 +30,12 @@ export class UsersController {
     return this.userService.create(userDto);
   }
 
+  @Post('/bulk/create')
+  @ApiCreatedResponse({ type: User, isArray: true })
+  async bulkCreate(@Body() userDto: UserDto[]) {
+    return await this.userService.bulkCreate(userDto);
+  }
+
   @Get('location/users')
   @ApiOkResponse({ type: User, isArray: true })
   async findAllByLocation() {
@@ -35,6 +47,14 @@ export class UsersController {
   async findAll() {
     // get all posts in the db
     return await this.userService.findAll();
+  }
+
+  @Get('/v2')
+  @ApiOkResponse({ type: User, isArray: true })
+  @ApiQuery({ name: 'page', required: false })
+  async findAllPage(@Query('page') page: number) {
+    // get all posts in the db
+    return await this.userService.findAllPage(page);
   }
 
   @Delete(':id')

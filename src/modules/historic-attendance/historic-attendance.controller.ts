@@ -15,13 +15,14 @@ export class HistoricAttendanceController {
   ) {}
 
   @Get()
-  @ApiQuery({ name: 'skip', required: false })
-  @ApiQuery({ name: 'take', required: false })
-  async findAll(@Query('skip') skip = '00', @Query('take') take = '10') {
-    return await this.historicAttendanceService.findAll(
-      parseInt(skip),
-      parseInt(take),
-    );
+  async findAll() {
+    return await this.historicAttendanceService.findAll();
+  }
+
+  @Get('/v2')
+  @ApiQuery({ name: 'page', required: false })
+  async findAllPage(@Query('page') page: number) {
+    return await this.historicAttendanceService.findAllPage(page);
   }
 
   @Get('/location/:location')
@@ -49,36 +50,28 @@ export class HistoricAttendanceController {
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'status', required: false })
-  @ApiQuery({ name: 'skip', required: false })
-  @ApiQuery({ name: 'take', required: false })
+  @ApiQuery({ name: 'page', required: false })
   findAllByLocationDateStatus(
     @Query('date') date?: string,
     @Query('location') location?: string,
     @Query('status') status?: string,
-    @Query('skip') skip = '00',
-    @Query('take') take = '10',
+    @Query('page') page?: number,
   ) {
     if (date && location && status) {
       return this.historicAttendanceService.filterStatusByLocationDate(
         date,
         location,
         status,
-        parseInt(skip),
-        parseInt(take),
+        page,
       );
     } else if (date && location) {
       return this.historicAttendanceService.findAllByLocationDate(
         location,
         date,
-        parseInt(skip),
-        parseInt(take),
+        page,
       );
     } else {
-      return this.historicAttendanceService.findAllByDate(
-        date,
-        parseInt(skip),
-        parseInt(take),
-      );
+      return this.historicAttendanceService.findAllByDate(date, page);
     }
   }
 

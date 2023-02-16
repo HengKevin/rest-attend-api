@@ -14,6 +14,23 @@ export class LocationService {
     return await this.prisma.location.findMany();
   }
 
+  async findAllPage(page = 1) {
+    const total = await this.prisma.location.count();
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.location.findMany({
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        dataPerPage: total / pages,
+      },
+    };
+  }
+
   async findOne(id: number) {
     return await this.prisma.location.findUnique({ where: { id } });
   }
