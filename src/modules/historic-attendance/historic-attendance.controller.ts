@@ -50,28 +50,31 @@ export class HistoricAttendanceController {
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'status', required: false })
-  @ApiQuery({ name: 'page', required: false })
   findAllByLocationDateStatus(
     @Query('date') date?: string,
     @Query('location') location?: string,
     @Query('status') status?: string,
-    @Query('page') page?: number,
   ) {
     if (date && location && status) {
       return this.historicAttendanceService.filterStatusByLocationDate(
         date,
         location,
         status,
-        page,
       );
     } else if (date && location) {
       return this.historicAttendanceService.findAllByLocationDate(
         location,
         date,
-        page,
+      );
+    } else if (date && status) {
+      return this.historicAttendanceService.findAllByDateStatus(date, status);
+    } else if (location && status) {
+      return this.historicAttendanceService.findAllByLocationStatus(
+        location,
+        status,
       );
     } else {
-      return this.historicAttendanceService.findAllByDate(date, page);
+      return this.historicAttendanceService.findAllByDate(date);
     }
   }
 
