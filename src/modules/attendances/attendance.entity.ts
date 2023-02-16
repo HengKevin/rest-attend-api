@@ -21,7 +21,7 @@ export class AttendanceEntity implements Attendances {
   name: string;
 
   @ApiProperty()
-  location: string;
+  level: string;
 
   @ApiProperty()
   time: string;

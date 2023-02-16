@@ -21,8 +21,8 @@ export class AttendancesService {
       if (!exist) {
         await this.hist.markAbsentAttendance(
           attendance.date,
-          student.email,
-          student.location,
+          student.id,
+          student.level,
           student.name,
         );
       }
@@ -30,7 +30,7 @@ export class AttendancesService {
     const res = await this.prisma.attendances.create({
       data: { ...attendance },
     });
-    await this.calculateAttendance(attendance.date, attendance.userEmail);
+    await this.calculateAttendance(attendance.date, attendance.userId);
     return res;
   }
 
@@ -38,23 +38,23 @@ export class AttendancesService {
     return this.prisma.attendances.findMany();
   }
 
-  async findAllByUserEmail(userEmail: string) {
-    return await this.prisma.attendances.findMany({ where: { userEmail } });
+  async findAllByUserId(userId: number) {
+    return await this.prisma.attendances.findMany({ where: { userId } });
   }
 
   async findAllByDate(date: string) {
     return await this.prisma.attendances.findMany({ where: { date } });
   }
 
-  async findAllByDateAndEmail(date: string, userEmail: string) {
+  async findAllByDateAndId(date: string, userId: number) {
     const res = await this.prisma.attendances.findMany({
-      where: { AND: [{ date: date }, { userEmail: userEmail }] },
+      where: { AND: [{ date: date }, { userId: userId }] },
     });
     return res;
   }
 
-  async calculateAttendance(date: string, userEmail: string) {
-    const filter = await this.findAllByDateAndEmail(date, userEmail);
+  async calculateAttendance(date: string, userId: number) {
+    const filter = await this.findAllByDateAndId(date, userId);
 
     const checkIn = filter[0].time;
     const checkOut = filter[filter.length - 1].time;
@@ -92,12 +92,12 @@ export class AttendancesService {
     }
 
     await this.prisma.users.update({
-      where: { email: filter[0].userEmail },
+      where: { id: filter[0].userId },
       data: { checkIn: checkIn, checkOut: checkOut },
     });
     if (filter.length > 1) {
       await this.prisma.historicAtt.updateMany({
-        where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+        where: { AND: [{ date: date }, { userId: filter[0].userId }] },
         data: {
           checkIn: checkIn,
           checkOut: checkOut,
@@ -107,7 +107,7 @@ export class AttendancesService {
       });
     } else {
       await this.prisma.historicAtt.updateMany({
-        where: { AND: [{ date: date }, { userEmail: filter[0].userEmail }] },
+        where: { AND: [{ date: date }, { userId: filter[0].userId }] },
         data: {
           checkIn: checkIn,
           attendanceStatus: stats,
@@ -118,15 +118,15 @@ export class AttendancesService {
     return filter;
   }
 
-  async findAllByLocationAndDate(location: string, date: string) {
+  async findAllByLevelAndDate(level: string, date: string) {
     return await this.prisma.attendances.findMany({
-      where: { AND: [{ location: location }, { date: date }] },
+      where: { AND: [{ level: level }, { date: date }] },
     });
   }
 
-  async findAllByLocation(location: string) {
+  async findAllByLevel(level: string) {
     return await this.prisma.attendances.findMany({
-      where: { location: location },
+      where: { level: level },
     });
   }
 

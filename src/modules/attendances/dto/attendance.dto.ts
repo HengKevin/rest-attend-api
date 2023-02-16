@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class AttendanceDto {
-  @IsString()
+  @IsInt()
   @ApiProperty()
-  userEmail: string;
+  userId: number;
 
   @IsString()
   @ApiProperty()
@@ -20,7 +20,7 @@ export class AttendanceDto {
 
   @IsString()
   @ApiProperty({ required: false })
-  location?: string;
+  level?: string;
 
   @IsString()
   @ApiProperty({ required: false })

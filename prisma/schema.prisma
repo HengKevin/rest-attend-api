@@ -39,7 +39,7 @@ model Attendances {
     id          Int      @id @default(autoincrement())
     createdAt   DateTime @default(now())
     date        String?
-    location    String?
+    level       String?
     time        String?
     temperature String?
     user        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -12,33 +12,33 @@ export class AttendancesController {
 
   @Get()
   @ApiQuery({ name: 'date', required: false })
-  @ApiQuery({ name: 'email', required: false })
-  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'id', required: false })
+  @ApiQuery({ name: 'level', required: false })
   findAttendances(
     @Query('date') date?: string,
-    @Query('email') email?: string,
-    @Query('location') location?: string,
+    @Query('id') id?: number,
+    @Query('level') level?: string,
   ) {
     if (date && location) {
-      return this.attendanceService.findAllByLocationAndDate(location, date);
+      return this.attendanceService.findAllByLevelAndDate(level, date);
     } else if (date) {
       return this.attendanceService.findAllByDate(date);
     } else if (location) {
-      return this.attendanceService.findAllByLocation(location);
-    } else if (email) {
-      return this.attendanceService.findAllByUserEmail(email);
+      return this.attendanceService.findAllByLevel(level);
+    } else if (id) {
+      return this.attendanceService.findAllByUserId(id);
     } else {
       return this.attendanceService.findAll();
     }
   }
 
-  @Get('calculateAttendance/:date/:userEmail')
+  @Get('calculateAttendance/:date/:userId')
   @ApiCreatedResponse({ type: Attendance })
   async calculateAttendance(
     @Param('date') date: string,
-    @Param('userEmail') userEmail: string,
+    @Param('userId') userId: number,
   ) {
-    return await this.attendanceService.calculateAttendance(date, userEmail);
+    return await this.attendanceService.calculateAttendance(date, userId);
   }
 
   @Post()
