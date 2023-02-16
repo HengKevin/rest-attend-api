@@ -8,24 +8,31 @@ datasource db {
 }
 
 model Admin {
-    id               Int           @id @default(autoincrement())
-    name             String
-    email            String        @unique
-    password         String
-    createdAt        DateTime      @default(now())
+    id        Int      @id @default(autoincrement())
+    name      String
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
 }
 
 model Users {
-    id               Int           @id @default(autoincrement())
-    name             String
-    email            String        @unique
-    faceString       String
-    checkIn          String?
-    checkOut         String?
-    location         String?
-    createdAt        DateTime      @default(now())
-    attendances      Attendances[]
-    historicAtts     HistoricAtt[]
+    id            Int           @id @default(autoincrement())
+    name          String
+    faceString    String
+    checkIn       String?
+    checkOut      String?
+    level         String?
+    teacher       String?
+    fatherName    String?
+    fatherNumber  String?
+    fatherChatId  String?
+    motherName    String?
+    motherNumber  String?
+    motherChatId  String?
+    learningShift String?
+    createdAt     DateTime      @default(now())
+    attendances   Attendances[]
+    historicAtts  HistoricAtt[]
 }
 
 model Attendances {
@@ -35,8 +42,8 @@ model Attendances {
     location    String?
     time        String?
     temperature String?
-    user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
-    userEmail   String
+    user        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId      Int
     name        String?
 }
 
@@ -49,22 +56,22 @@ model AttendanceRule {
 }
 
 model HistoricAtt {
-    id          Int      @id @default(autoincrement())
-    date        String?
-    location    String?
-    checkIn     String?
-    checkOut    String?
-    temperature String?
+    id               Int     @id @default(autoincrement())
+    date             String?
+    location         String?
+    checkIn          String?
+    checkOut         String?
+    temperature      String?
     attendanceStatus String?
-    checkOutStatus String?
-    user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
-    userEmail   String
-    name        String?
+    checkOutStatus   String?
+    user             Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId           Int
+    name             String?
 
-    @@unique([date, userEmail])
+    @@unique([date, userId])
 }
 
 model Location {
-    id      Int     @id @default(autoincrement())
-    name    String?
+    id   Int     @id @default(autoincrement())
+    name String?
 }

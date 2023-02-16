@@ -7,12 +7,18 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity as User } from './user.entity';
 import { UserDto } from './dto/user.dto';
-import { UsernameDto } from './dto/username.dto';
+
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
@@ -30,10 +36,16 @@ export class UsersController {
     return await this.userService.bulkCreate(userDto);
   }
 
-  @Get('location/users')
+  @Get('/paginated')
+  @ApiQuery({ name: 'page', required: false })
+  async findAllPaginated(@Query('page') page) {
+    return await this.userService.findAllPaginated(page);
+  }
+
+  @Get('level/users')
   @ApiOkResponse({ type: User, isArray: true })
-  async findAllByLocation() {
-    return await this.userService.findAllByLocation();
+  async findAllByLevel(@Query('level') level: string) {
+    return await this.userService.findAllByLevel(level);
   }
 
   @Get()
@@ -53,8 +65,24 @@ export class UsersController {
   @ApiOkResponse({ type: User })
   async updateOneName(
     @Param('id', ParseIntPipe) id: number,
-    @Body() usernameDto: UsernameDto,
+    @Body('name') name: string,
+    @Body('level') level: string,
+    @Body('teacher') teacher: string,
+    @Body('fatherName') fatherName: string,
+    @Body('fatherNumber') fatherNumber: string,
+    @Body('fatherChatId') fatherChatId: string,
+    @Body('motherNumber') motherNumber: string,
+    @Body('motherChatId') motherChatId: string,
   ) {
-    return await this.userService.updateOneName(id, usernameDto.name);
+    const update = await this.userService.updateOneUser(id, {
+      name,
+      level,
+      teacher,
+      fatherNumber,
+      fatherChatId,
+      motherNumber,
+      motherChatId,
+    });
+    return update;
   }
 }

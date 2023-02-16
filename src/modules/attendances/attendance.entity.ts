@@ -12,7 +12,7 @@ export class AttendanceEntity implements Attendances {
   date: string;
 
   @ApiProperty()
-  userEmail: string;
+  userId: number;
 
   @ApiProperty()
   temperature: string;

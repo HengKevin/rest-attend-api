@@ -14,7 +14,7 @@ export class AttendancesService {
   async create(attendance: AttendanceDto) {
     const students = await this.prisma.users.findMany();
     for (const student of students) {
-      const exist = await this.hist.findAllByDateAndEmail(
+      const exist = await this.hist.findAllByDateAndId(
         attendance.date,
         student.email,
       );

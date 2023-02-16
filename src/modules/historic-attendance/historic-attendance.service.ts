@@ -33,13 +33,13 @@ export class HistoricAttendanceService {
     };
   }
 
-  async findAllByUserEmail(userEmail: string) {
-    return await this.prisma.historicAtt.findMany({ where: { userEmail } });
+  async findAllByUserId(id: number) {
+    return await this.prisma.historicAtt.findMany({ where: { id } });
   }
 
-  async findAllByDateAndEmail(date: string, userEmail: string) {
+  async findAllByDateAndId(date: string, id: string) {
     return await this.prisma.historicAtt.findUnique({
-      where: { date_userEmail: { date, userEmail } },
+      where: { AND: [{ date: date }, { id: id }] },
     });
   }
 
@@ -71,9 +71,9 @@ export class HistoricAttendanceService {
     });
   }
 
-  async findOneByDateAndEmail(date: string, userEmail: string) {
+  async findOneByDateAndId(date: string, id: number) {
     return await this.prisma.attendances.findMany({
-      where: { AND: [{ date: date }, { userEmail: userEmail }] },
+      where: { AND: [{ date: date }, { id: id }] },
     });
   }
 

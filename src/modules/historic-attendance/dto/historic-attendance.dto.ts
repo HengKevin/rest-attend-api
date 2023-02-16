@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class HistoricAttDto {
   @IsString()
@@ -14,9 +14,9 @@ export class HistoricAttDto {
   @ApiProperty({ required: false })
   checkOutStatus: string;
 
-  @IsString()
+  @IsInt()
   @ApiProperty()
-  userEmail: string;
+  userId: number;
 
   @IsString()
   @ApiProperty({ required: false })

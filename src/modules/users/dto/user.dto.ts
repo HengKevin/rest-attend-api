@@ -8,15 +8,43 @@ export class UserDto {
 
   @IsString()
   @ApiProperty()
-  email: string;
-
-  @IsString()
-  @ApiProperty()
-  location: string;
-
-  @IsString()
-  @ApiProperty()
   faceString: string;
+
+  @IsString()
+  @ApiProperty()
+  level: string;
+
+  @IsString()
+  @ApiProperty()
+  teacher: string;
+
+  @IsString()
+  @ApiProperty()
+  fatherName: string;
+
+  @IsString()
+  @ApiProperty()
+  fatherNumber: string;
+
+  @IsString()
+  @ApiProperty()
+  fatherChatId: string;
+
+  @IsString()
+  @ApiProperty()
+  motherName: string;
+
+  @IsString()
+  @ApiProperty()
+  motherNumber: string;
+
+  @IsString()
+  @ApiProperty()
+  motherChatId: string;
+
+  @IsString()
+  @ApiProperty()
+  learningShift: string;
 
   @ApiProperty()
   createdAt: Date;

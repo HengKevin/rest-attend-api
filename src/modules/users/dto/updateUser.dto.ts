@@ -1,51 +1,48 @@
-import { Users } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-export class UserEntity implements Users {
-  @ApiProperty()
-  id: number;
+import { IsString } from 'class-validator';
 
+export class updateUserDto {
+  @IsString()
   @ApiProperty()
   name: string;
 
+  @IsString()
   @ApiProperty()
   faceString: string;
 
+  @IsString()
   @ApiProperty()
   level: string;
 
+  @IsString()
   @ApiProperty()
   teacher: string;
 
+  @IsString()
   @ApiProperty()
   fatherName: string;
 
+  @IsString()
   @ApiProperty()
   fatherNumber: string;
 
+  @IsString()
   @ApiProperty()
   fatherChatId: string;
 
+  @IsString()
   @ApiProperty()
   motherName: string;
 
+  @IsString()
   @ApiProperty()
   motherNumber: string;
 
+  @IsString()
   @ApiProperty()
   motherChatId: string;
 
+  @IsString()
   @ApiProperty()
   learningShift: string;
-
-  @ApiProperty()
-  checkIn: string;
-
-  @ApiProperty()
-  checkOut: string;
-
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  attendanceStatus: string;
 }

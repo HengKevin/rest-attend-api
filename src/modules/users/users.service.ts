@@ -36,8 +36,25 @@ export class UsersService {
     return await this.prisma.users.findMany({});
   }
 
-  async findOne(email: string) {
-    return await this.prisma.users.findUnique({ where: { email } });
+  async findAllPaginated(page = 1) {
+    const total = await this.prisma.users.count();
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.users.findMany({
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        dataPerPage: total / pages,
+      },
+    };
+  }
+
+  async findOne(id: number) {
+    return await this.prisma.users.findUnique({ where: { id } });
   }
 
   async findAdminByEmail(email: string): Promise<Admin | undefined> {
@@ -46,20 +63,24 @@ export class UsersService {
     return foundAdmin;
   }
 
-  async findAllByLocation() {
-    const locations = await this.location.findAll();
-    const userArr = [];
-    for (const loc of locations) {
-      const total = await this.prisma.users.count({
-        where: { location: loc.name },
-      });
-      const users = {
-        location: loc.name,
-        total: total,
-      };
-      userArr.push(users);
-    }
-    return userArr;
+  // async findAllByLocation() {
+  //   const locations = await this.location.findAll();
+  //   const userArr = [];
+  //   for (const loc of locations) {
+  //     const total = await this.prisma.users.count({
+  //       where: { location: loc.name },
+  //     });
+  //     const users = {
+  //       location: loc.name,
+  //       total: total,
+  //     };
+  //     userArr.push(users);
+  //   }
+  //   return userArr;
+  // }
+
+  async findAllByLevel(level: string) {
+    return await this.prisma.users.findMany({ where: { level } });
   }
 
   async deleteOne(id: number) {
@@ -71,5 +92,24 @@ export class UsersService {
       where: { id },
       data: { name: name },
     });
+  }
+
+  async updateOneUser(
+    id: number,
+    data: {
+      name?: string;
+      level?: string;
+      teacher?: string;
+      fatherNumber?: string;
+      fatherChatId?: string;
+      motherNumber?: string;
+      motherChatId?: string;
+      learningSupport?: string;
+      learningSupportNumber?: string;
+      learningShift?: string;
+    },
+  ) {
+    const user = await this.prisma.users.update({ where: { id: id }, data });
+    return user;
   }
 }
