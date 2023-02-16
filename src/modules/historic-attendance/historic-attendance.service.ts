@@ -47,7 +47,11 @@ export class HistoricAttendanceService {
     });
   }
 
-  async findAllByDate(date: string, page = 1) {
+  async findAllByDate(date: string) {
+    return await this.prisma.historicAtt.findMany({ where: { date } });
+  }
+
+  async findAllByDatePage(date: string, page = 1) {
     const total = await this.prisma.historicAtt.count({ where: { date } });
     const pages = Math.ceil(total / 10);
     const his = await this.prisma.historicAtt.findMany({
@@ -78,6 +82,18 @@ export class HistoricAttendanceService {
   async findOneByDateAndEmail(date: string, userEmail: string) {
     return await this.prisma.attendances.findMany({
       where: { AND: [{ date: date }, { userEmail: userEmail }] },
+    });
+  }
+
+  async findAllByDateStatus(date: string, status: string) {
+    return await this.prisma.historicAtt.findMany({
+      where: { AND: [{ date: date }, { attendanceStatus: status }] },
+    });
+  }
+
+  async findAllByLocationStatus(location: string, status: string) {
+    return await this.prisma.historicAtt.findMany({
+      where: { AND: [{ location: location }, { attendanceStatus: status }] },
     });
   }
 
