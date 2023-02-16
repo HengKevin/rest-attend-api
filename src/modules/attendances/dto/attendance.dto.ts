@@ -3,12 +3,16 @@ import { IsString } from 'class-validator';
 
 export class AttendanceDto {
   @IsString()
-  @ApiProperty({ required: false })
-  status: string;
+  @ApiProperty()
+  userEmail: string;
 
   @IsString()
   @ApiProperty()
-  userEmail: string;
+  name: string;
+
+  @IsString()
+  @ApiProperty({ required: false })
+  temperature: string;
 
   @IsString()
   @ApiProperty({ required: false })
@@ -21,8 +25,4 @@ export class AttendanceDto {
   @IsString()
   @ApiProperty({ required: false })
   time?: string;
-
-  @IsString()
-  @ApiProperty({ required: false })
-  temperature?: string;
 }

@@ -28,8 +28,12 @@ export class UsersService {
     return await this.prisma.users.create({ data: user });
   }
 
+  async bulkCreate(users: UserDto[]) {
+    return await this.prisma.users.createMany({ data: users });
+  }
+
   async findAll() {
-    return await this.prisma.users.findMany();
+    return await this.prisma.users.findMany({});
   }
 
   async findOne(email: string) {

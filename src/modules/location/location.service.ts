@@ -11,7 +11,7 @@ export class LocationService {
   }
 
   async findAll() {
-    return await this.prisma.location.findMany();
+    return await this.prisma.location.findMany({});
   }
 
   async findOne(id: number) {

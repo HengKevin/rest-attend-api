@@ -16,8 +16,21 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.create({ data: { ...history } });
   }
 
-  async findAll(skip?: number, take?: number) {
-    return await this.prisma.historicAtt.findMany({ skip, take });
+  async findAll(page = 1) {
+    const total = await this.prisma.historicAtt.count();
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.historicAtt.findMany({
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        dataPerPage: total / pages,
+      },
+    };
   }
 
   async findAllByUserEmail(userEmail: string) {
@@ -30,13 +43,22 @@ export class HistoricAttendanceService {
     });
   }
 
-  async findAllByDate(date: string, skip?: number, take?: number) {
+  async findAllByDate(date: string, page = 1) {
+    const total = await this.prisma.historicAtt.count({ where: { date } });
+    const pages = Math.ceil(total / 10);
     const his = await this.prisma.historicAtt.findMany({
       where: { date },
-      skip,
-      take,
+      take: 10,
+      skip: 10 * (page - 1),
     });
-    return his;
+    return {
+      data: his,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        dataPerPage: total / pages,
+      },
+    };
   }
 
   async delete(id: number) {
@@ -59,17 +81,19 @@ export class HistoricAttendanceService {
     date: string,
     userEmail: string,
     location: string,
+    name: string,
   ) {
     return await this.prisma.historicAtt.create({
       data: {
         date: date,
-        temperature: 'undefined',
         location: location,
         checkIn: '--:--',
         checkOut: '--:--',
+        temperature: '0',
         attendanceStatus: 'Absent',
         checkOutStatus: 'undefined',
         userEmail: userEmail,
+        name: name,
       },
     });
   }
@@ -83,14 +107,10 @@ export class HistoricAttendanceService {
       });
 
       const absent = res.filter((item) => item.attendanceStatus === 'Absent');
-      const unusual_temp = res.filter(
-        (item) => parseFloat(item.temperature) >= 37.5,
-      );
       const summary = {
         location: loc.name,
         total: res.length,
         absent: absent.length,
-        unusual_temp: unusual_temp.length,
       };
       summArr.push(summary);
     }
@@ -101,9 +121,12 @@ export class HistoricAttendanceService {
     date?: string,
     location?: string,
     status?: string,
-    skip?: number,
-    take?: number,
+    page = 1,
   ) {
+    const total = await this.prisma.historicAtt.count({
+      where: { date: date },
+    });
+    const pages = Math.ceil(total / 10);
     const res = await this.prisma.historicAtt.findMany({
       where: {
         AND: [
@@ -112,22 +135,24 @@ export class HistoricAttendanceService {
           { location: location },
         ],
       },
-      skip,
-      take,
+      take: 10,
+      skip: 10 * (page - 1),
     });
-    return res;
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        dataPerPage: total / pages,
+      },
+    };
   }
 
-  async findAllByLocationDate(
-    location: string,
-    date: string,
-    skip?: number,
-    take?: number,
-  ) {
+  async findAllByLocationDate(location: string, date: string, page = 1) {
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { date: date }] },
-      skip,
-      take,
+      take: 10,
+      skip: 10 * (page - 1),
     });
   }
 

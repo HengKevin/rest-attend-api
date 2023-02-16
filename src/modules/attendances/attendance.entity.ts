@@ -12,13 +12,13 @@ export class AttendanceEntity implements Attendances {
   date: string;
 
   @ApiProperty()
+  userEmail: string;
+
+  @ApiProperty()
   temperature: string;
 
   @ApiProperty()
-  status: string;
-
-  @ApiProperty()
-  userEmail: string;
+  name: string;
 
   @ApiProperty()
   location: string;
