@@ -143,6 +143,22 @@ export class HistoricAttendanceService {
     date?: string,
     location?: string,
     status?: string,
+  ) {
+    return await this.prisma.historicAtt.findMany({
+      where: {
+        AND: [
+          { date: date },
+          { attendanceStatus: status },
+          { location: location },
+        ],
+      },
+    });
+  }
+
+  async filterStatusByLocationDatePage(
+    date?: string,
+    location?: string,
+    status?: string,
     page = 1,
   ) {
     const total = await this.prisma.historicAtt.count({
