@@ -170,11 +170,9 @@ export class HistoricAttendanceService {
     };
   }
 
-  async findAllByLocationDate(location: string, date: string, page = 1) {
+  async findAllByLocationDate(location: string, date: string) {
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { date: date }] },
-      take: 10,
-      skip: 10 * (page - 1),
     });
   }
 
