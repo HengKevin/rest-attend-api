@@ -78,6 +78,47 @@ export class HistoricAttendanceController {
     }
   }
 
+  @Get('/location/date/status/v2')
+  @ApiQuery({ name: 'date', required: false })
+  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  findAllByLocationDateStatusPagination(
+    @Query('date') date?: string,
+    @Query('location') location?: string,
+    @Query('status') status?: string,
+    @Query('page') page?: number,
+  ) {
+    if (date && location && status) {
+      return this.historicAttendanceService.filterStatusByLocationDatePage(
+        date,
+        location,
+        status,
+        page,
+      );
+    } else if (date && location) {
+      return this.historicAttendanceService.findAllByLocationDatePage(
+        location,
+        date,
+        page,
+      );
+    } else if (date && status) {
+      return this.historicAttendanceService.findAllByDateStatusPage(
+        date,
+        status,
+        page,
+      );
+    } else if (location && status) {
+      return this.historicAttendanceService.findAllByLocationStatusPage(
+        location,
+        status,
+        page,
+      );
+    } else {
+      return this.historicAttendanceService.findAllByDatePage(date, page);
+    }
+  }
+
   @Get('/attendance/location/date/:date')
   summaryByLocationDate(@Param('date') date: string) {
     return this.historicAttendanceService.summaryByLocationDate(date);
