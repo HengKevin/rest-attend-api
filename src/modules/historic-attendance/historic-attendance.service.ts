@@ -32,7 +32,8 @@ export class HistoricAttendanceService {
       pagination: {
         totalData: total,
         totalPages: pages,
-        dataPerPage: 10,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
       },
     };
   }
@@ -64,7 +65,8 @@ export class HistoricAttendanceService {
       pagination: {
         totalData: total,
         totalPages: pages,
-        dataPerPage: total / pages,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
       },
     };
   }
@@ -91,10 +93,56 @@ export class HistoricAttendanceService {
     });
   }
 
+  async findAllByDateStatusPage(date: string, status: string, page = 1) {
+    const total = await this.prisma.historicAtt.count({
+      where: { AND: [{ date: date }, { attendanceStatus: status }] },
+    });
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.historicAtt.findMany({
+      where: { AND: [{ date: date }, { attendanceStatus: status }] },
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
+      },
+    };
+  }
+
   async findAllByLocationStatus(location: string, status: string) {
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { attendanceStatus: status }] },
     });
+  }
+
+  async findAllByLocationStatusPage(
+    location: string,
+    status: string,
+    page = 1,
+  ) {
+    const total = await this.prisma.historicAtt.count({
+      where: { AND: [{ location: location }, { attendanceStatus: status }] },
+    });
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.historicAtt.findMany({
+      where: { AND: [{ location: location }, { attendanceStatus: status }] },
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
+      },
+    };
   }
 
   async markAbsentAttendance(
@@ -181,7 +229,8 @@ export class HistoricAttendanceService {
       pagination: {
         totalData: total,
         totalPages: pages,
-        dataPerPage: total / pages,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
       },
     };
   }
@@ -190,6 +239,27 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { date: date }] },
     });
+  }
+
+  async findAllByLocationDatePage(location: string, date: string, page = 1) {
+    const total = await this.prisma.historicAtt.count({
+      where: { AND: [{ location: location }, { date: date }] },
+    });
+    const pages = Math.ceil(total / 10);
+    const res = await this.prisma.historicAtt.findMany({
+      where: { AND: [{ location: location }, { date: date }] },
+      take: 10,
+      skip: 10 * (page - 1),
+    });
+    return {
+      data: res,
+      pagination: {
+        totalData: total,
+        totalPages: pages,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
+      },
+    };
   }
 
   async exportDataByDate(date: string) {

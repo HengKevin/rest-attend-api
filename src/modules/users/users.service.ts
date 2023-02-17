@@ -48,7 +48,8 @@ export class UsersService {
       pagination: {
         totalData: total,
         totalPages: pages,
-        dataPerPage: total / pages,
+        currentPage: Number(page),
+        dataPerPage: page < pages ? 10 : total % 10,
       },
     };
   }
