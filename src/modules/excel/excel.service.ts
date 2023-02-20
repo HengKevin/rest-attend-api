@@ -24,7 +24,6 @@ export class ExcelService {
     const worksheet = workbook.addWorksheet('Attendance');
 
     worksheet.columns = [
-      { header: 'ID', key: 'id', width: 10 },
       { header: 'Date', key: 'date', width: 20 },
       { header: 'Temperature', key: 'temperature', width: 20 },
       { header: 'Location', key: 'location', width: 20 },
