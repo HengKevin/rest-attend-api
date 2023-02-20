@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { Delete, Patch, Query } from '@nestjs/common/decorators';
+import { Delete, Patch } from '@nestjs/common/decorators';
 import { ParseIntPipe } from '@nestjs/common/pipes';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { LocationDto } from './dto/location.dto';
 import { LocationService } from './location.service';
 
@@ -21,9 +21,8 @@ export class LocationController {
   }
 
   @Get('/v2')
-  @ApiQuery({ name: 'page', required: false })
-  findAllPage(@Query('page') page: number) {
-    return this.locationService.findAllPage(page);
+  findAllPage() {
+    return this.locationService.findAllPage();
   }
 
   @Get(':id')
