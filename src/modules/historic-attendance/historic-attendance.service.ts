@@ -117,7 +117,7 @@ export class HistoricAttendanceService {
     return summArr;
   }
 
-  async filterStatusByLocationDate(
+  async filterStatusByLevelDate(
     date?: string,
     level?: string,
     status?: string,

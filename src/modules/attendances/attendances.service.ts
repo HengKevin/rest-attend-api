@@ -3,12 +3,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceDto } from './dto/attendance.dto';
 import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
 import * as moment from 'moment';
+import { AttendanceRuleService } from '../attendance-rule/attendance-rule.service';
+import { UtilService } from '../util/util.service';
 
 @Injectable()
 export class AttendancesService {
   constructor(
     private prisma: PrismaService,
     private hist: HistoricAttendanceService,
+    private attendanceRule: AttendanceRuleService,
+    private util: UtilService,
   ) {}
 
   async create(attendance: AttendanceDto) {
@@ -30,6 +34,27 @@ export class AttendancesService {
     const res = await this.prisma.attendances.create({
       data: { ...attendance },
     });
+    const attRule = await this.attendanceRule.findAll();
+    const timeIn = attRule[0].onDutyTime;
+    const timeOut = attRule[0].offDutyTime;
+    const filter = await this.findAllByDateAndId(
+      attendance.date,
+      attendance.userId,
+    );
+    if (filter.length == 0 && attendance.time.localeCompare(timeIn) === -1) {
+      const user = await this.prisma.users.findUnique({
+        where: { id: attendance.userId },
+      });
+      const message = `${user.name} has checked into school at ${attendance.time}`;
+      await this.util.sendTelegramCheckInMessage(user.fatherChatId, message);
+    }
+    if (filter.length > 1) {
+      const user = await this.prisma.users.findUnique({
+        where: { id: attendance.userId },
+      });
+      const message = `${user.name} has checked out of school at ${attendance.time}`;
+      await this.util.sendTelegramCheckOutMessage(user.fatherChatId, message);
+    }
     await this.calculateAttendance(attendance.date, attendance.userId);
     return res;
   }

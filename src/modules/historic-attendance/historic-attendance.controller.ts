@@ -30,38 +30,35 @@ export class HistoricAttendanceController {
     return this.historicAttendanceService.findAllByDate(date);
   }
 
-  @Get(':date/:userEmail')
+  @Get(':date/:userId')
   findAllByDateAndEmail(
     @Param('date') date: string,
-    @Param('userEmail') userEmail: string,
+    @Param('userId', ParseIntPipe) userId: number,
   ) {
-    return this.historicAttendanceService.findAllByDateAndEmail(
-      date,
-      userEmail,
-    );
+    return this.historicAttendanceService.findAllByDateAndId(date, userId);
   }
 
   @Get('/location/date/status')
   @ApiQuery({ name: 'date', required: false })
-  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'level', required: false })
   @ApiQuery({ name: 'status', required: false })
   @ApiQuery({ name: 'page', required: false })
   findAllByLocationDateStatus(
     @Query('date') date?: string,
-    @Query('location') location?: string,
+    @Query('level') level?: string,
     @Query('status') status?: string,
     @Query('page') page?: number,
   ) {
     if (date && location && status) {
-      return this.historicAttendanceService.filterStatusByLocationDate(
+      return this.historicAttendanceService.filterStatusByLevelDate(
         date,
-        location,
+        level,
         status,
         page,
       );
-    } else if (date && location) {
-      return this.historicAttendanceService.findAllByLocationDate(
-        location,
+    } else if (date && level) {
+      return this.historicAttendanceService.findAllByLevelDate(
+        level,
         date,
         page,
       );
@@ -75,20 +72,17 @@ export class HistoricAttendanceController {
     return this.historicAttendanceService.summaryByLocationDate(date);
   }
 
-  @Get(':userEmail')
-  findAllByUserEmail(@Param('userEmail') userEmail: string) {
-    return this.historicAttendanceService.findAllByUserEmail(userEmail);
+  @Get(':userId')
+  findAllByUserEmail(@Param('userId', ParseIntPipe) userId: number) {
+    return this.historicAttendanceService.findAllByUserId(userId);
   }
 
-  @Get(':date/:userEmail')
+  @Get(':date/:userId')
   findOneByDateAndEmail(
     @Param('date') date: string,
-    @Param('userEmail') userEmail: string,
+    @Param('userId', ParseIntPipe) userId: number,
   ) {
-    return this.historicAttendanceService.findOneByDateAndEmail(
-      date,
-      userEmail,
-    );
+    return this.historicAttendanceService.findOneByDateAndId(date, userId);
   }
 
   @Get('/attendance/excel/location/date')

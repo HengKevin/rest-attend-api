@@ -37,6 +37,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "telegraf": "^4.11.2",
     "tmp": "^0.2.1"
   },
   "devDependencies": {

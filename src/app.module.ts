@@ -10,6 +10,7 @@ import { LocationModule } from './modules/location/location.module';
 import { ExcelModule } from './modules/excel/excel.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminsModule } from './modules/admins/admins.module';
+import { UtilModule } from './modules/util/util.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AdminsModule } from './modules/admins/admins.module';
     ExcelModule,
     AuthModule,
     AdminsModule,
+    UtilModule,
   ],
   controllers: [AppController],
   providers: [AppService],
