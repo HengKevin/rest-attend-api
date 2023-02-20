@@ -20,9 +20,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/v2')
-  @ApiQuery({ name: 'page', required: false })
-  async findAllPage(@Query('page') page: number) {
-    return await this.historicAttendanceService.findAllPage(page);
+  async findAllPage() {
+    return await this.historicAttendanceService.findAllPage();
   }
 
   @Get('/location/:location')
@@ -82,40 +81,34 @@ export class HistoricAttendanceController {
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'status', required: false })
-  @ApiQuery({ name: 'page', required: false })
   findAllByLocationDateStatusPagination(
     @Query('date') date?: string,
     @Query('location') location?: string,
     @Query('status') status?: string,
-    @Query('page') page?: number,
   ) {
     if (date && location && status) {
       return this.historicAttendanceService.filterStatusByLocationDatePage(
         date,
         location,
         status,
-        page,
       );
     } else if (date && location) {
       return this.historicAttendanceService.findAllByLocationDatePage(
         location,
         date,
-        page,
       );
     } else if (date && status) {
       return this.historicAttendanceService.findAllByDateStatusPage(
         date,
         status,
-        page,
       );
     } else if (location && status) {
       return this.historicAttendanceService.findAllByLocationStatusPage(
         location,
         status,
-        page,
       );
     } else {
-      return this.historicAttendanceService.findAllByDatePage(date, page);
+      return this.historicAttendanceService.findAllByDatePage(date);
     }
   }
 
