@@ -19,11 +19,11 @@ export class AttendancesController {
     @Query('id') id?: string,
     @Query('level') level?: string,
   ) {
-    if (date && location) {
+    if (date && level) {
       return this.attendanceService.findAllByLevelAndDate(level, date);
     } else if (date) {
       return this.attendanceService.findAllByDate(date);
-    } else if (location) {
+    } else if (level) {
       return this.attendanceService.findAllByLevel(level);
     } else if (id) {
       return this.attendanceService.findAllByUserId(id);
