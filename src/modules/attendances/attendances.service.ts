@@ -63,7 +63,7 @@ export class AttendancesService {
     return this.prisma.attendances.findMany();
   }
 
-  async findAllByUserId(userId: number) {
+  async findAllByUserId(userId: string) {
     return await this.prisma.attendances.findMany({ where: { userId } });
   }
 
@@ -71,14 +71,14 @@ export class AttendancesService {
     return await this.prisma.attendances.findMany({ where: { date } });
   }
 
-  async findAllByDateAndId(date: string, userId: number) {
+  async findAllByDateAndId(date: string, userId: string) {
     const res = await this.prisma.attendances.findMany({
       where: { AND: [{ date: date }, { userId: userId }] },
     });
     return res;
   }
 
-  async calculateAttendance(date: string, userId: number) {
+  async calculateAttendance(date: string, userId: string) {
     const filter = await this.findAllByDateAndId(date, userId);
 
     const checkIn = filter[0].time;

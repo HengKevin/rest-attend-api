@@ -16,7 +16,7 @@ export class AttendancesController {
   @ApiQuery({ name: 'level', required: false })
   findAttendances(
     @Query('date') date?: string,
-    @Query('id') id?: number,
+    @Query('id') id?: string,
     @Query('level') level?: string,
   ) {
     if (date && location) {
@@ -36,7 +36,7 @@ export class AttendancesController {
   @ApiCreatedResponse({ type: Attendance })
   async calculateAttendance(
     @Param('date') date: string,
-    @Param('userId') userId: number,
+    @Param('userId') userId: string,
   ) {
     return await this.attendanceService.calculateAttendance(date, userId);
   }
