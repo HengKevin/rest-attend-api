@@ -21,7 +21,7 @@ export class HistoricEntity implements HistoricAtt {
   checkOutStatus: string;
 
   @ApiProperty()
-  userId: number;
+  userId: string;
 
   @ApiProperty()
   level: string;

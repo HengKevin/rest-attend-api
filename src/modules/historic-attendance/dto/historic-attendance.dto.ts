@@ -16,7 +16,7 @@ export class HistoricAttDto {
 
   @IsInt()
   @ApiProperty()
-  userId: number;
+  userId: string;
 
   @IsString()
   @ApiProperty({ required: false })

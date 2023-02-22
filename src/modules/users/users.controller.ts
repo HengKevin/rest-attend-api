@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -57,14 +56,14 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOkResponse({ type: User })
-  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+  async deleteOne(@Param('id') id: string) {
     return await this.userService.deleteOne(id);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: User })
   async updateOneName(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body('name') name: string,
     @Body('level') level: string,
     @Body('teacher') teacher: string,

@@ -10,7 +10,7 @@ interface Historic {
   checkOut: string;
   attendanceStatus: string;
   checkOutStatus: string;
-  userId: number;
+  userId: string;
   name: string;
 }
 
@@ -58,7 +58,7 @@ export class ExcelService {
     worksheet.columns = [
       { header: 'Date', key: 'date', width: 30 },
       { header: 'Name', key: 'name', width: 20 },
-      { header: 'Email', key: 'email', width: 30 },
+      { header: 'UserId', key: 'id', width: 30 },
       { header: 'Early', key: 'early', width: 10 },
       { header: 'Late', key: 'late', width: 10 },
       { header: 'Absent', key: 'absent', width: 10 },

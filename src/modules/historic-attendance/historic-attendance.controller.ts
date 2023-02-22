@@ -33,7 +33,7 @@ export class HistoricAttendanceController {
   @Get(':date/:userId')
   findAllByDateAndEmail(
     @Param('date') date: string,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: string,
   ) {
     return this.historicAttendanceService.findAllByDateAndId(date, userId);
   }
@@ -73,14 +73,14 @@ export class HistoricAttendanceController {
   }
 
   @Get(':userId')
-  findAllByUserEmail(@Param('userId', ParseIntPipe) userId: number) {
+  findAllByUserEmail(@Param('userId') userId: string) {
     return this.historicAttendanceService.findAllByUserId(userId);
   }
 
   @Get(':date/:userId')
   findOneByDateAndEmail(
     @Param('date') date: string,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: string,
   ) {
     return this.historicAttendanceService.findOneByDateAndId(date, userId);
   }

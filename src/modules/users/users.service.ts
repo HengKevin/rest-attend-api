@@ -53,7 +53,7 @@ export class UsersService {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.prisma.users.findUnique({ where: { id } });
   }
 
@@ -83,11 +83,11 @@ export class UsersService {
     return await this.prisma.users.findMany({ where: { level } });
   }
 
-  async deleteOne(id: number) {
+  async deleteOne(id: string) {
     return await this.prisma.users.delete({ where: { id } });
   }
 
-  async updateOneName(id: number, name: string) {
+  async updateOneName(id: string, name: string) {
     return await this.prisma.users.update({
       where: { id },
       data: { name: name },
@@ -95,7 +95,7 @@ export class UsersService {
   }
 
   async updateOneUser(
-    id: number,
+    id: string,
     data: {
       name?: string;
       level?: string;

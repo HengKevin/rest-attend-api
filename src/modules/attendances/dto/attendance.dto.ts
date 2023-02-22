@@ -4,7 +4,7 @@ import { IsInt, IsString } from 'class-validator';
 export class AttendanceDto {
   @IsInt()
   @ApiProperty()
-  userId: number;
+  userId: string;
 
   @IsString()
   @ApiProperty()
