@@ -243,18 +243,17 @@ export class HistoricAttendanceService {
     const users = await this.prisma.users.findMany({
       where: { location: location },
     });
+    const totalCount = await this.prisma.historicAtt.count({
+      where: {
+        AND: [
+          { date: { gte: startDate } },
+          { date: { lte: endDate } },
+          { location: location },
+        ],
+      },
+    });
+    const total = Math.floor(totalCount / users.length);
     for (const user of users) {
-      const early = await this.prisma.historicAtt.count({
-        where: {
-          AND: [
-            { attendanceStatus: 'Early' },
-            { date: { gte: startDate } },
-            { date: { lte: endDate } },
-            { userEmail: user.email },
-            { location: location },
-          ],
-        },
-      });
       const late = await this.prisma.historicAtt.count({
         where: {
           AND: [
@@ -281,9 +280,11 @@ export class HistoricAttendanceService {
         date: startDate + ' - ' + endDate,
         name: user.name,
         email: user.email,
-        early: early,
+        total: total,
         late: late,
         absent: absent,
+        percentage:
+          String(Math.round(((total - absent) / total) * 100)) + ' ' + '%',
       });
     }
     const res = await this.excel.downloadExcelByLocation(data, location);
