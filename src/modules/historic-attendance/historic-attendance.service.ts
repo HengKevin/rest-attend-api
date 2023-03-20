@@ -252,7 +252,9 @@ export class HistoricAttendanceService {
         ],
       },
     });
+    console.log(totalCount);
     const total = Math.floor(totalCount / users.length);
+    console.log(total);
     for (const user of users) {
       const late = await this.prisma.historicAtt.count({
         where: {
@@ -288,6 +290,78 @@ export class HistoricAttendanceService {
       });
     }
     const res = await this.excel.downloadExcelByLocation(data, location);
+    return res;
+  }
+
+  async exportDataByLocationMonth(
+    month: number,
+    year: number,
+    location: string,
+  ) {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
+    const day = startDate.getDate().toString().padStart(2, '0');
+    const months = (startDate.getMonth() + 1).toString().padStart(2, '0');
+    const years = startDate.getFullYear().toString();
+    const startDateStr = `${day}-${months}-${years}`;
+    console.log(startDateStr);
+
+    const day2 = endDate.getDate().toString().padStart(2, '0');
+    const months2 = (endDate.getMonth() + 1).toString().padStart(2, '0');
+    const years2 = endDate.getFullYear().toString();
+    const endDateStr = `${day2}-${months2}-${years2}`;
+    console.log(endDateStr);
+
+    const data = [];
+    const users = await this.prisma.users.findMany({
+      where: { location: location },
+    });
+    const totalCount = await this.prisma.historicAtt.count({
+      where: {
+        AND: [{ location: location }],
+      },
+    });
+    const total = Math.floor(totalCount / users.length);
+    for (const user of users) {
+      const late = await this.prisma.historicAtt.count({
+        where: {
+          AND: [
+            { attendanceStatus: 'Late' },
+            { date: { gte: startDateStr } },
+            { date: { lte: endDateStr } },
+            { userEmail: user.email },
+            { location: location },
+          ],
+        },
+      });
+      const absent = await this.prisma.historicAtt.count({
+        where: {
+          AND: [
+            { attendanceStatus: 'Absent' },
+            { date: { gte: startDateStr } },
+            { date: { lte: endDateStr } },
+            { userEmail: user.email },
+            { location: location },
+          ],
+        },
+      });
+      data.push({
+        month: month,
+        year: year,
+        name: user.name,
+        email: user.email,
+        total: total,
+        late: late,
+        absent: absent,
+        percentage:
+          String(Math.round(((total - absent) / total) * 100)) + ' ' + '%',
+      });
+    }
+    const res = await this.excel.downloadExcelByMonthAndLocation(
+      data,
+      location,
+    );
     return res;
   }
 }
