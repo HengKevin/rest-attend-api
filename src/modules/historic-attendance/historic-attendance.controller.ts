@@ -192,6 +192,41 @@ export class HistoricAttendanceController {
         console.error(err);
       });
   }
+
+  @Get('/attendance/excel/month/location')
+  @ApiQuery({ name: 'month', required: false })
+  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'year', required: false })
+  async excelByMonthLocation(
+    @Query('month') month: number,
+    @Query('year') year: number,
+    @Query('location') location: string,
+    @Res() res: Response,
+  ) {
+    const exportPath =
+      await this.historicAttendanceService.exportDataByLocationMonth(
+        month,
+        year,
+        location,
+      );
+    fs.promises
+      .stat(exportPath)
+      .then((stat) => {
+        if (stat.isFile()) {
+          res.download(exportPath, 'attendance.xlsx', (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              fs.unlinkSync(exportPath);
+            }
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
   @Post()
   create(@Body() historicAttendanceDto: HistoricAttDto) {
     return this.historicAttendanceService.create(historicAttendanceDto);
