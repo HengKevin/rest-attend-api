@@ -10,6 +10,7 @@ import { LocationModule } from './modules/location/location.module';
 import { ExcelModule } from './modules/excel/excel.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminsModule } from './modules/admins/admins.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -22,6 +23,9 @@ import { AdminsModule } from './modules/admins/admins.module';
     ExcelModule,
     AuthModule,
     AdminsModule,
+    MulterModule.register({
+      dest: './uploads',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
