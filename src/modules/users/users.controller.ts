@@ -7,12 +7,22 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity as User } from './user.entity';
 import { UserDto } from './dto/user.dto';
 import { UsernameDto } from './dto/username.dto';
+import { UseInterceptors } from '@nestjs/common/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
@@ -28,6 +38,28 @@ export class UsersController {
   @ApiCreatedResponse({ type: User, isArray: true })
   async bulkCreate(@Body() userDto: UserDto[]) {
     return await this.userService.bulkCreate(userDto);
+  }
+
+  @Post('/json/register')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'JSON file',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async registerJson(@UploadedFile() file) {
+    const jsonData = await this.userService.readFromJson(file);
+    console.log(jsonData);
+
+    return 'Success';
   }
 
   @Get('location/users')
