@@ -3,7 +3,6 @@ import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationService } from '../location/location.service';
 import { Multer } from 'multer';
-import { readFileSync } from 'fs';
 
 export type Admin = any;
 @Injectable()
@@ -89,6 +88,15 @@ export class UsersService {
 
   async readFromJson(file: Multer.File): Promise<any> {
     const jsonData = JSON.parse(file.buffer.toString('utf8'));
-    return jsonData;
+    for (const data of jsonData) {
+      const user = {
+        name: data.name,
+        email: data.email,
+        location: data.location,
+        faceString: data.imageurl,
+      };
+      await this.prisma.users.create({ data: user });
+    }
+    return 'Success';
   }
 }

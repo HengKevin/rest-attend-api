@@ -22,8 +22,7 @@ import { UserDto } from './dto/user.dto';
 import { UsernameDto } from './dto/username.dto';
 import { UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import { Multer } from 'multer';
+
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
