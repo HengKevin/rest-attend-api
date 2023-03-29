@@ -26,11 +26,44 @@ export class UsersService {
   ];
 
   async create(user: UserDto) {
-    return await this.prisma.users.create({ data: user });
+    const exists = await this.prisma.users.findUnique({
+      where: { email: user.email },
+    });
+
+    if (exists) {
+      return 'Email already exists';
+    }
+    return await this.prisma.users.create({
+      data: {
+        name: user.name,
+        email: user.email,
+        location: user.location,
+        faceString: user.faceString,
+        createdAt: user.createdAt,
+      },
+    });
   }
 
   async bulkCreate(users: UserDto[]) {
-    return await this.prisma.users.createMany({ data: users });
+    for (const data of users) {
+      const exists = await this.prisma.users.findUnique({
+        where: { email: data.email },
+      });
+
+      if (exists) {
+        continue;
+      }
+      await this.prisma.users.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          location: data.location,
+          faceString: data.faceString,
+          createdAt: data.createdAt,
+        },
+      });
+    }
+    return 'Success';
   }
 
   async findAll() {
@@ -89,13 +122,20 @@ export class UsersService {
   async readFromJson(file: Multer.File): Promise<any> {
     const jsonData = JSON.parse(file.buffer.toString('utf8'));
     for (const data of jsonData) {
-      const user = {
-        name: data.name,
-        email: data.email,
-        location: data.location,
-        faceString: data.imageurl,
-      };
-      await this.prisma.users.create({ data: user });
+      const exists = await this.prisma.users.findUnique({
+        where: { email: data.email },
+      });
+      if (exists) {
+        continue;
+      } else {
+        const user = {
+          name: data.name,
+          email: data.email,
+          location: data.location,
+          faceString: data.faceString,
+        };
+        await this.prisma.users.create({ data: user });
+      }
     }
     return 'Success';
   }

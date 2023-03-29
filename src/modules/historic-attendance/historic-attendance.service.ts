@@ -317,13 +317,16 @@ export class HistoricAttendanceService {
     const users = await this.prisma.users.findMany({
       where: { location: location },
     });
-    const totalCount = await this.prisma.historicAtt.count({
-      where: {
-        AND: [{ location: location }],
-      },
-    });
-    const total = Math.floor(totalCount / users.length);
     for (const user of users) {
+      const total = await this.prisma.historicAtt.count({
+        where: {
+          AND: [
+            { date: { gte: startDateStr } },
+            { date: { lte: endDateStr } },
+            { userEmail: user.email },
+          ],
+        },
+      });
       const late = await this.prisma.historicAtt.count({
         where: {
           AND: [
