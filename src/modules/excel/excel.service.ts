@@ -25,7 +25,6 @@ export class ExcelService {
 
     worksheet.columns = [
       { header: 'Date', key: 'date', width: 20 },
-      { header: 'Temperature', key: 'temperature', width: 20 },
       { header: 'Location', key: 'location', width: 20 },
       { header: 'Check In', key: 'checkIn', width: 20 },
       { header: 'Check Out', key: 'checkOut', width: 20 },

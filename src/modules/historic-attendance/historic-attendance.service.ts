@@ -243,41 +243,16 @@ export class HistoricAttendanceService {
     const users = await this.prisma.users.findMany({
       where: { location: location },
     });
-    const totalCount = await this.prisma.historicAtt.count({
-      where: {
-        AND: [
-          { date: { gte: startDate } },
-          { date: { lte: endDate } },
-          { location: location },
-        ],
-      },
-    });
-    console.log(totalCount);
-    const total = Math.floor(totalCount / users.length);
-    console.log(total);
     for (const user of users) {
-      const late = await this.prisma.historicAtt.count({
-        where: {
-          AND: [
-            { attendanceStatus: 'Late' },
-            { date: { gte: startDate } },
-            { date: { lte: endDate } },
-            { userEmail: user.email },
-            { location: location },
-          ],
-        },
-      });
-      const absent = await this.prisma.historicAtt.count({
-        where: {
-          AND: [
-            { attendanceStatus: 'Absent' },
-            { date: { gte: startDate } },
-            { date: { lte: endDate } },
-            { userEmail: user.email },
-            { location: location },
-          ],
-        },
-      });
+      const count = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDate}, 'dd-mm-yyyy') AND to_date(${endDate}, 'dd-mm-yyyy') AND users.email = ${user.email} AND htp."location" = ${location}`;
+      const total = Number(count[0].count);
+      const lateCount = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDate}, 'dd-mm-yyyy') AND to_date(${endDate}, 'dd-mm-yyyy') AND users.email = ${user.email} AND htp."attendanceStatus" = 'Late' AND htp."location" = ${location}`;
+      const late = Number(lateCount[0].count);
+      const absentCount = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDate}, 'dd-mm-yyyy') AND to_date(${endDate}, 'dd-mm-yyyy') AND users.email = ${user.email} AND htp."attendanceStatus" = 'Absent' AND htp."location" = ${location}`;
+      const absent = Number(absentCount[0].count);
       data.push({
         date: startDate + ' - ' + endDate,
         name: user.name,
@@ -305,50 +280,26 @@ export class HistoricAttendanceService {
     const months = (startDate.getMonth() + 1).toString().padStart(2, '0');
     const years = startDate.getFullYear().toString();
     const startDateStr = `${day}-${months}-${years}`;
-    console.log(startDateStr);
 
     const day2 = endDate.getDate().toString().padStart(2, '0');
     const months2 = (endDate.getMonth() + 1).toString().padStart(2, '0');
     const years2 = endDate.getFullYear().toString();
     const endDateStr = `${day2}-${months2}-${years2}`;
-    console.log(endDateStr);
 
     const data = [];
     const users = await this.prisma.users.findMany({
       where: { location: location },
     });
     for (const user of users) {
-      const total = await this.prisma.historicAtt.count({
-        where: {
-          AND: [
-            { date: { gte: startDateStr } },
-            { date: { lte: endDateStr } },
-            { userEmail: user.email },
-          ],
-        },
-      });
-      const late = await this.prisma.historicAtt.count({
-        where: {
-          AND: [
-            { attendanceStatus: 'Late' },
-            { date: { gte: startDateStr } },
-            { date: { lte: endDateStr } },
-            { userEmail: user.email },
-            { location: location },
-          ],
-        },
-      });
-      const absent = await this.prisma.historicAtt.count({
-        where: {
-          AND: [
-            { attendanceStatus: 'Absent' },
-            { date: { gte: startDateStr } },
-            { date: { lte: endDateStr } },
-            { userEmail: user.email },
-            { location: location },
-          ],
-        },
-      });
+      const count = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDateStr}, 'dd-mm-yyyy') AND to_date(${endDateStr}, 'dd-mm-yyyy') AND users.email = ${user.email} AND htp."location" = ${location}`;
+      const total = Number(count[0].count);
+      const lateCount = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDateStr}, 'dd-mm-yyyy') AND to_date(${endDateStr}, 'dd-mm-yyyy') AND users.email = ${user.email} AND htp."attendanceStatus" = 'Late' AND htp."location" = ${location}`;
+      const late = Number(lateCount[0].count);
+      const absentCount = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDateStr}, 'dd-mm-yyyy') AND to_date(${endDateStr}, 'dd-mm-yyyy') AND users.email = ${user.email} AND htp."attendanceStatus" = 'Absent' AND htp."location" = ${location}`;
+      const absent = Number(absentCount[0].count);
       data.push({
         month: month,
         year: year,
