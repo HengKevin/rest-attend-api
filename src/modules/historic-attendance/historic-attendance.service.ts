@@ -268,6 +268,39 @@ export class HistoricAttendanceService {
     return res;
   }
 
+  async exportDataByDateRangeUsers(
+    startDate: string,
+    endDate: string,
+    users: string[],
+  ) {
+    const data = [];
+    for (const user of users) {
+      const name = await this.prisma
+        .$queryRaw`SELECT name FROM public."Users" as users WHERE users.email = ${user}`;
+      const count = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDate}, 'dd-mm-yyyy') AND to_date(${endDate}, 'dd-mm-yyyy') AND users.email = ${user}`;
+      const total = Number(count[0].count);
+      const lateCount = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDate}, 'dd-mm-yyyy') AND to_date(${endDate}, 'dd-mm-yyyy') AND users.email = ${user} AND htp."attendanceStatus" = 'Late'`;
+      const late = Number(lateCount[0].count);
+      const absentCount = await this.prisma
+        .$queryRaw`SELECT COUNT(*) FROM public."HistoricAtt" as htp JOIN public."Users" as users ON htp."userEmail" = users.email WHERE to_date(htp.date, 'dd-mm-yyyy') BETWEEN to_date(${startDate}, 'dd-mm-yyyy') AND to_date(${endDate}, 'dd-mm-yyyy') AND users.email = ${user} AND htp."attendanceStatus" = 'Absent'`;
+      const absent = Number(absentCount[0].count);
+      data.push({
+        date: startDate + ' - ' + endDate,
+        name: name,
+        email: user,
+        total: total,
+        late: late,
+        absent: absent,
+        percentage:
+          String(Math.round(((total - absent) / total) * 100)) + ' ' + '%',
+      });
+    }
+    const res = await this.excel.downloadExcelByDateRange(data);
+    return res;
+  }
+
   async exportDataByLocationMonth(
     month: number,
     year: number,

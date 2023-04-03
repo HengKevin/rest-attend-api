@@ -227,6 +227,40 @@ export class HistoricAttendanceController {
       });
   }
 
+  @Get('/odoo/attendance')
+  @ApiQuery({ name: 'startDate', required: true })
+  @ApiQuery({ name: 'endDate', required: true })
+  @ApiQuery({ name: 'users', required: true })
+  async odooAttendance(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('users') users: string[],
+    @Res() res: Response,
+  ) {
+    const exportPath =
+      await this.historicAttendanceService.exportDataByDateRangeUsers(
+        startDate,
+        endDate,
+        users,
+      );
+    fs.promises
+      .stat(exportPath)
+      .then((stat) => {
+        if (stat.isFile()) {
+          res.download(exportPath, 'attendance.xlsx', (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              fs.unlinkSync(exportPath);
+            }
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
   @Post()
   create(@Body() historicAttendanceDto: HistoricAttDto) {
     return this.historicAttendanceService.create(historicAttendanceDto);
