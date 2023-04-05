@@ -22,6 +22,7 @@ import { UserDto } from './dto/user.dto';
 import { UsernameDto } from './dto/username.dto';
 import { UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FaceStringDto } from './dto/faceString.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -95,5 +96,17 @@ export class UsersController {
     @Body() usernameDto: UsernameDto,
   ) {
     return await this.userService.updateOneName(id, usernameDto.name);
+  }
+
+  @Patch('/update/faceString/:email')
+  @ApiOkResponse({ type: User })
+  async updateFaceString(
+    @Param('email') email: string,
+    @Body() faceString: FaceStringDto,
+  ) {
+    return await this.userService.updateFaceString(
+      email,
+      faceString.faceString,
+    );
   }
 }

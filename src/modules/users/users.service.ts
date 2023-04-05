@@ -139,4 +139,11 @@ export class UsersService {
     }
     return 'Success';
   }
+
+  async updateFaceString(email: string, faceString: string) {
+    return await this.prisma.users.update({
+      where: { email },
+      data: { faceString },
+    });
+  }
 }
