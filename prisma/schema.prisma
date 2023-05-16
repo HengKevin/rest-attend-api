@@ -22,7 +22,7 @@ model Users {
     faceString       String
     checkIn          String?
     checkOut         String?
-    location         String?
+    location         String
     createdAt        DateTime      @default(now())
     attendances      Attendances[]
     historicAtts     HistoricAtt[]
@@ -65,5 +65,5 @@ model HistoricAtt {
 
 model Location {
     id      Int     @id @default(autoincrement())
-    name    String?
+    name    String  @unique()
 }

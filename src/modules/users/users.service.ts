@@ -29,9 +29,15 @@ export class UsersService {
     const exists = await this.prisma.users.findUnique({
       where: { email: user.email },
     });
-
+    const locations = await this.prisma.location.findMany();
     if (exists) {
       return 'Email already exists';
+    }
+    if (!locations.find((loc) => loc.name === user.location)) {
+      return 'Location does not exist';
+    }
+    if (user.name === '') {
+      return 'Name cannot be empty';
     }
     return await this.prisma.users.create({
       data: {
