@@ -39,13 +39,19 @@ export class UsersService {
     if (user.name === '') {
       return 'Name cannot be empty';
     }
+
+    const face = user.faceString;
+    const array = face.split(',');
+    if (array.length !== 512) {
+      return 'The face string is not valid, must be 512 floats separated by commas';
+    }
+
     return await this.prisma.users.create({
       data: {
         name: user.name,
         email: user.email,
         location: user.location,
         faceString: user.faceString,
-        createdAt: user.createdAt,
       },
     });
   }
@@ -65,7 +71,6 @@ export class UsersService {
           email: data.email,
           location: data.location,
           faceString: data.faceString,
-          createdAt: data.createdAt,
         },
       });
     }
