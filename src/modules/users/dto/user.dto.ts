@@ -17,7 +17,4 @@ export class UserDto {
   @IsString()
   @ApiProperty()
   faceString: string;
-
-  @ApiProperty()
-  createdAt: Date;
 }
