@@ -8,7 +8,30 @@ export class AttendanceRuleService {
   constructor(private prisma: PrismaService) {}
 
   async create(rule: AttendanceRuleDto) {
-    return await this.prisma.attendanceRule.create({ data: { ...rule } });
+    const earlyMinute = rule.earlyMinute;
+    const lateMinute = rule.lateMinute;
+    const offDutyTime = rule.offDutyTime;
+    const onDutyTime = rule.onDutyTime;
+
+    if (!Number(earlyMinute) || !Number(lateMinute)) {
+      return 'earlyMinute and lateMinute must be a number';
+    }
+
+    if (!this.hasTimeFormat(offDutyTime) || !this.hasTimeFormat(onDutyTime)) {
+      return 'offDutyTime or onDutyTime must be a valid time';
+    }
+    const exist = await this.prisma.attendanceRule.findFirst();
+    const avail = await this.prisma.attendanceRule.findMany();
+    if (exist && avail.length > 0) {
+      return this.update(exist.id, rule);
+    } else {
+      return await this.prisma.attendanceRule.create({ data: { ...rule } });
+    }
+  }
+
+  hasTimeFormat(str: string): boolean {
+    const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+    return timeRegex.test(str);
   }
 
   async findAll() {
