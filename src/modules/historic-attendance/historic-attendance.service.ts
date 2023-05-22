@@ -65,6 +65,10 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocation(location: string) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     return await this.prisma.historicAtt.findMany({
       where: { location: location },
     });
@@ -99,12 +103,20 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocationStatus(location: string, status: string) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { attendanceStatus: status }] },
     });
   }
 
   async findAllByLocationStatusPage(location: string, status: string) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     const total = await this.prisma.historicAtt.count({
       where: { AND: [{ location: location }, { attendanceStatus: status }] },
     });
@@ -125,6 +137,10 @@ export class HistoricAttendanceService {
     userEmail: string,
     location: string,
   ) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     return await this.prisma.historicAtt.create({
       data: {
         date: date,
@@ -205,12 +221,20 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocationDate(location: string, date: string) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { date: date }] },
     });
   }
 
   async findAllByLocationDatePage(location: string, date: string) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     const total = await this.prisma.historicAtt.count({
       where: { AND: [{ location: location }, { date: date }] },
     });
@@ -239,6 +263,10 @@ export class HistoricAttendanceService {
     endDate: string,
     location: string,
   ) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     const data = [];
     const users = await this.prisma.users.findMany({
       where: { location: location },
@@ -306,6 +334,10 @@ export class HistoricAttendanceService {
     year: number,
     location: string,
   ) {
+    const validLoc = await this.validateLocation(location);
+    if (!validLoc) {
+      return 'Location does not exist';
+    }
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 
@@ -350,5 +382,13 @@ export class HistoricAttendanceService {
       location,
     );
     return res;
+  }
+
+  async validateLocation(location: string) {
+    const locations = await this.prisma.location.findMany();
+    if (locations.find((loc) => loc.name === location)) {
+      return true;
+    }
+    return false;
   }
 }

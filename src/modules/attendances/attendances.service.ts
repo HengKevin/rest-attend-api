@@ -3,16 +3,21 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceDto } from './dto/attendance.dto';
 import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
 import * as moment from 'moment';
+import { LocationService } from '../location/location.service';
 
 @Injectable()
 export class AttendancesService {
   constructor(
     private prisma: PrismaService,
     private hist: HistoricAttendanceService,
+    private location: LocationService,
   ) {}
 
   async create(attendance: AttendanceDto) {
     const students = await this.prisma.users.findMany();
+    if (this.validateLocation(attendance.location)) {
+      return 'Location does not exist';
+    }
     for (const student of students) {
       const exist = await this.hist.findAllByDateAndEmail(
         attendance.date,
@@ -120,12 +125,20 @@ export class AttendancesService {
   }
 
   async findAllByLocationAndDate(location: string, date: string) {
+    const validLoc = await this.validateLocation(location);
+    if (validLoc) {
+      return 'Location does not exist';
+    }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ location: location }, { date: date }] },
     });
   }
 
   async findAllByLocation(location: string) {
+    const validLoc = await this.validateLocation(location);
+    if (validLoc) {
+      return 'Location does not exist';
+    }
     return await this.prisma.attendances.findMany({
       where: { location: location },
     });
@@ -133,5 +146,13 @@ export class AttendancesService {
 
   async deleteOne(id: number) {
     return await this.prisma.attendances.delete({ where: { id } });
+  }
+
+  async validateLocation(location: string) {
+    const locations = await this.prisma.location.findMany();
+    if (locations.find((loc) => loc.name === location)) {
+      return false;
+    }
+    return true;
   }
 }
