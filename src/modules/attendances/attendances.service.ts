@@ -132,6 +132,56 @@ export class AttendancesService {
     return filter;
   }
 
+  async findAllByDateAndLocationAndUserEmail(
+    date: string,
+    location: string,
+    userEmail: string,
+  ) {
+    const validLoc = await this.validateLocation(location);
+    if (validLoc) {
+      return 'Location does not exist';
+    }
+    const validDate = this.validateDate(date);
+    if (!validDate) {
+      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+    }
+    const validEmail = await this.validateUserEmail(userEmail);
+    if (!validEmail) {
+      return 'Invalid email';
+    }
+    return await this.prisma.attendances.findMany({
+      where: { AND: [{ date }, { location }, { userEmail }] },
+    });
+  }
+
+  async findAllByDateAndUserEmail(date: string, userEmail: string) {
+    const validEmail = await this.validateUserEmail(userEmail);
+    if (!validEmail) {
+      return 'Invalid email';
+    }
+    const validDate = this.validateDate(date);
+    if (!validDate) {
+      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+    }
+    return await this.prisma.attendances.findMany({
+      where: { AND: [{ date }, { userEmail }] },
+    });
+  }
+
+  async findAllByUserEmailAndLocation(userEmail: string, location: string) {
+    const validEmail = await this.validateUserEmail(userEmail);
+    if (!validEmail) {
+      return 'Invalid Email';
+    }
+    const validLoc = await this.validateLocation(location);
+    if (validLoc) {
+      return 'Location does not exist';
+    }
+    return await this.prisma.attendances.findMany({
+      where: { AND: [{ userEmail }, { location }] },
+    });
+  }
+
   async findAllByLocationAndDate(location: string, date: string) {
     const validLoc = await this.validateLocation(location);
     if (validLoc) {

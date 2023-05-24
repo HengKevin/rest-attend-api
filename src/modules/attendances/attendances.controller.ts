@@ -19,8 +19,21 @@ export class AttendancesController {
     @Query('email') email?: string,
     @Query('location') location?: string,
   ) {
-    if (date && location) {
+    if (date && location && email) {
+      return this.attendanceService.findAllByDateAndLocationAndUserEmail(
+        date,
+        location,
+        email,
+      );
+    } else if (date && location) {
       return this.attendanceService.findAllByLocationAndDate(location, date);
+    } else if (date && email) {
+      return this.attendanceService.findAllByDateAndUserEmail(date, email);
+    } else if (email && location) {
+      return this.attendanceService.findAllByUserEmailAndLocation(
+        email,
+        location,
+      );
     } else if (date) {
       return this.attendanceService.findAllByDate(date);
     } else if (location) {
