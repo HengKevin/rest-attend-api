@@ -20,7 +20,7 @@ export class AttendanceRuleController {
   @Post()
   @ApiAcceptedResponse({ type: AttendanceRuleService })
   create(@Body() attendanceRuleDto: AttendanceRuleDto) {
-    return this.attendanceRuleService.create(attendanceRuleDto);
+      return this.attendanceRuleService.create(attendanceRuleDto);
   }
 
   @Patch()

@@ -27,12 +27,12 @@ export class LocationController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.locationService.findOne(id);
+    return this.locationService.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() location: LocationDto) {
-    return this.locationService.update(id, location);
+    return this.locationService.update(+id, location);
   }
 
   @Delete(':id')

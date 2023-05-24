@@ -7,7 +7,8 @@ export class LocationService {
   constructor(private prisma: PrismaService) {}
 
   async create(location: LocationDto) {
-    return await this.prisma.location.create({ data: { ...location } });
+    location.name = location.name.toLowerCase();
+    return await this.prisma.location.create({ data: location });
   }
 
   async findAll() {
@@ -27,10 +28,12 @@ export class LocationService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.location.findUnique({ where: { id } });
+    return await this.prisma.location.findUnique({ where: { id:id } });
   }
 
   async update(id: number, location: LocationDto) {
+    console.log(typeof id);
+    
     return await this.prisma.location.update({
       where: { id },
       data: { ...location },

@@ -26,34 +26,61 @@ export class UsersService {
   ];
 
   async create(user: UserDto) {
-    const exists = await this.prisma.users.findUnique({
-      where: { email: user.email },
-    });
-    const locations = await this.prisma.location.findMany();
-    if (exists) {
-      return 'Email already exists';
-    }
-    if (!locations.find((loc) => loc.name === user.location)) {
-      return 'Location does not exist';
-    }
-    if (user.name === '') {
-      return 'Name cannot be empty';
-    }
+    try {
+      // I dont want to write full 512 flaot string, so I generate it randomly
+      console.log('Location :', user.location);
+      function generateFaceString() {
+        let faceString = '';
+        for (let i = 0; i < 512; i++) {
+          faceString += Math.random().toFixed(6);
+          if (i < 511) {
+            faceString += ',';
+          }
+        }
+        return faceString;
+      }
+      // console.log("Face String :",  generateFaceString());
+      const exists = await this.prisma.users.findUnique({
+        where: { email: user.email },
+      });
+      const locations = await this.prisma.location.findMany();
+      if (exists) {
+        throw new Error('Email already exists');
+      }
+      if (
+        !locations.find(
+          (loc) =>
+            loc.name.toLocaleLowerCase() === user.location.toLocaleLowerCase(),
+        )
+      ) {
+        throw new Error('Location does not exist');
+      }
 
-    const face = user.faceString;
-    const array = face.split(',');
-    if (array.length !== 512) {
-      return 'The face string is not valid, must be 512 floats separated by commas';
-    }
+      if (user.name === '') {
+        throw new Error('Name cannot be empty');
+      }
 
-    return await this.prisma.users.create({
-      data: {
-        name: user.name,
-        email: user.email,
-        location: user.location,
-        faceString: user.faceString,
-      },
-    });
+      user.faceString = generateFaceString();
+      const face = user.faceString;
+      const array = face.split(',');
+      if (array.length !== 512) {
+        throw new Error(
+          'The face string is not valid, must be 512 floats separated by commas',
+        );
+      }
+
+      return await this.prisma.users.create({
+        data: {
+          name: user.name,
+          email: user.email,
+          location: user.location.toLocaleLowerCase(),
+          faceString: user.faceString,
+        },
+      });
+    } catch (error) {
+      console.log('Error : ', error.message);
+      return { message: error.message, status: false };
+    }
   }
 
   async bulkCreate(users: UserDto[]) {
