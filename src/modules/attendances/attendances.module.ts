@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
 import { LocationService } from '../location/location.service';
 import { ExcelService } from '../excel/excel.service';
+import { UsersService } from '../users/users.service';
 
 @Module({
   providers: [
@@ -13,6 +14,7 @@ import { ExcelService } from '../excel/excel.service';
     HistoricAttendanceService,
     LocationService,
     ExcelService,
+    UsersService,
   ],
   controllers: [AttendancesController],
 })

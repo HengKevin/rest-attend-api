@@ -4,6 +4,7 @@ import { AttendanceDto } from './dto/attendance.dto';
 import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
 import * as moment from 'moment';
 import { LocationService } from '../location/location.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AttendancesService {
@@ -11,6 +12,7 @@ export class AttendancesService {
     private prisma: PrismaService,
     private hist: HistoricAttendanceService,
     private location: LocationService,
+    private user: UsersService,
   ) {}
 
   async create(attendance: AttendanceDto) {
@@ -43,10 +45,19 @@ export class AttendancesService {
   }
 
   async findAllByUserEmail(userEmail: string) {
-    return await this.prisma.attendances.findMany({ where: { userEmail } });
+    const validEmail = await this.validateUserEmail(userEmail);
+    if (!validEmail) {
+      return 'Invalid email';
+    } else {
+      return await this.prisma.attendances.findMany({ where: { userEmail } });
+    }
   }
 
   async findAllByDate(date: string) {
+    const validDate = this.validateDate(date);
+    if (!validDate) {
+      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+    }
     return await this.prisma.attendances.findMany({ where: { date } });
   }
 
@@ -129,6 +140,10 @@ export class AttendancesService {
     if (validLoc) {
       return 'Location does not exist';
     }
+    const validDate = this.validateDate(date);
+    if (!validDate) {
+      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+    }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ location: location }, { date: date }] },
     });
@@ -154,5 +169,39 @@ export class AttendancesService {
       return false;
     }
     return true;
+  }
+
+  validateDate(date: string) {
+    const datePattern = /^([0-3][0-9])-([0-1][0-9])-([0-9]{4})$/;
+    const match = datePattern.exec(date);
+
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10);
+
+      if (day <= 31 && month <= 12) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async valdiateLocation(location: string) {
+    const locations = this.location.findAll();
+    if ((await locations).find((loc) => loc.name === location)) {
+      return true;
+    }
+    return false;
+  }
+
+  async validateUserEmail(userEmail: string) {
+    const exists = await this.prisma.users.findUnique({
+      where: { email: userEmail },
+    });
+    if (exists) {
+      return true;
+    }
+    return false;
   }
 }
