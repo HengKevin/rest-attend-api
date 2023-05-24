@@ -3,22 +3,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceDto } from './dto/attendance.dto';
 import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
 import * as moment from 'moment';
-import { LocationService } from '../location/location.service';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AttendancesService {
   constructor(
     private prisma: PrismaService,
     private hist: HistoricAttendanceService,
-    private location: LocationService,
-    private user: UsersService,
   ) {}
 
   async create(attendance: AttendanceDto) {
     const students = await this.prisma.users.findMany();
-    if (this.validateLocation(attendance.location)) {
-      return 'Location does not exist';
+    const validateAttendance = await this.validateAttendance(attendance);
+    if (validateAttendance.status === false) {
+      return validateAttendance.message;
     }
     for (const student of students) {
       const exist = await this.hist.findAllByDateAndEmail(
@@ -160,6 +157,10 @@ export class AttendancesService {
   }
 
   async deleteOne(id: number) {
+    const exists = await this.prisma.attendances.findUnique({ where: { id } });
+    if (!exists) {
+      return 'Attendance does not exist';
+    }
     return await this.prisma.attendances.delete({ where: { id } });
   }
 
@@ -187,14 +188,6 @@ export class AttendancesService {
     return false;
   }
 
-  async valdiateLocation(location: string) {
-    const locations = this.location.findAll();
-    if ((await locations).find((loc) => loc.name === location)) {
-      return true;
-    }
-    return false;
-  }
-
   async validateUserEmail(userEmail: string) {
     const exists = await this.prisma.users.findUnique({
       where: { email: userEmail },
@@ -203,5 +196,33 @@ export class AttendancesService {
       return true;
     }
     return false;
+  }
+
+  hasTimeFormat(str: string): boolean {
+    const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+    return timeRegex.test(str);
+  }
+
+  async validateAttendance(dto: AttendanceDto) {
+    const validDate = this.validateDate(dto.date);
+    if (!validDate) {
+      return {
+        message: 'Date format is invalid, must be in this format DD-MM-YYYY',
+        status: false,
+      };
+    }
+    const validEmail = await this.validateUserEmail(dto.userEmail);
+    if (!validEmail) {
+      return { message: 'Invalid email', status: false };
+    }
+    const validLoc = await this.validateLocation(dto.location);
+    if (validLoc) {
+      return { message: 'Location does not exist', status: false };
+    }
+    const validTime = this.hasTimeFormat(dto.time);
+    if (!validTime) {
+      return { message: 'Time format is invalid', status: false };
+    }
+    return { message: 'Valid', status: true };
   }
 }
