@@ -58,9 +58,7 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file'))
   async registerJson(@UploadedFile() file) {
     const jsonData = await this.userService.readFromJson(file);
-    console.log(jsonData);
-
-    return 'Success';
+    return jsonData;
   }
 
   @Get('location/users')

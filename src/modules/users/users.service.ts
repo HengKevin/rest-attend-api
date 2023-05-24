@@ -3,6 +3,7 @@ import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationService } from '../location/location.service';
 import { Multer } from 'multer';
+import fs from 'fs';
 
 export type Admin = any;
 @Injectable()
@@ -26,34 +27,18 @@ export class UsersService {
   ];
 
   async create(user: UserDto) {
-    const exists = await this.prisma.users.findUnique({
-      where: { email: user.email },
-    });
-    const locations = await this.prisma.location.findMany();
-    if (exists) {
-      return 'Email already exists';
+    const valid = await this.validateUser(user);
+    if (valid.status === true) {
+      return await this.prisma.users.create({
+        data: {
+          name: user.name,
+          email: user.email,
+          location: user.location,
+          faceString: user.faceString,
+        },
+      });
     }
-    if (!locations.find((loc) => loc.name === user.location)) {
-      return 'Location does not exist';
-    }
-    if (user.name === '') {
-      return 'Name cannot be empty';
-    }
-
-    const face = user.faceString;
-    const array = face.split(',');
-    if (array.length !== 512) {
-      return 'The face string is not valid, must be 512 floats separated by commas';
-    }
-
-    return await this.prisma.users.create({
-      data: {
-        name: user.name,
-        email: user.email,
-        location: user.location,
-        faceString: user.faceString,
-      },
-    });
+    return valid.message;
   }
 
   async bulkCreate(users: UserDto[]) {
@@ -120,35 +105,96 @@ export class UsersService {
   }
 
   async deleteOne(id: number) {
+    const exist = await this.prisma.users.findUnique({ where: { id } });
+    if (!exist) {
+      return 'User not found';
+    }
     return await this.prisma.users.delete({ where: { id } });
   }
 
   async updateOneName(id: number, name: string) {
+    const exist = await this.prisma.users.findUnique({ where: { id } });
+    const special = this.containsSpecialCharacter(name);
+    if (!exist) {
+      return 'User not found';
+    }
+    if (
+      name === '' ||
+      special === true ||
+      name === 'null' ||
+      name === 'undefined' ||
+      name === 'NaN'
+    ) {
+      return 'Name cannot be empty or contain special characters';
+    }
+    if (this.isStringLengthValid(name, 50) === false) {
+      return 'Name cannot be longer than 50 characters';
+    }
     return await this.prisma.users.update({
       where: { id },
       data: { name: name },
     });
   }
 
-  async readFromJson(file: Multer.File): Promise<any> {
-    const jsonData = JSON.parse(file.buffer.toString('utf8'));
-    for (const data of jsonData) {
-      const exists = await this.prisma.users.findUnique({
-        where: { email: data.email },
-      });
-      if (exists) {
-        continue;
-      } else {
-        const user = {
-          name: data.name,
-          email: data.email,
-          location: data.location,
-          faceString: data.faceString,
-        };
-        await this.prisma.users.create({ data: user });
+  containsSpecialCharacter(input: string): boolean {
+    const specialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
+    return specialCharacterPattern.test(input);
+  }
+
+  isStringLengthValid(input: string, maxLength: number): boolean {
+    return input.length <= maxLength;
+  }
+
+  async validateJsonFile(file: Multer.File) {
+    try {
+      const fileContents = fs.readFileSync(file);
+      const jsonData = JSON.parse(fileContents.toString('utf8'));
+
+      if (
+        !Array.isArray(jsonData) ||
+        jsonData.length === 0 ||
+        !jsonData.every((obj) => typeof obj === 'object')
+      ) {
+        return { message: 'File is not valid JSON', status: false };
       }
+      return { message: 'File is valid JSON', status: true };
+    } catch (err) {
+      return { message: 'File is not valid JSON', status: false };
     }
-    return 'Success';
+  }
+
+  async readFromJson(file: Multer.File): Promise<any> {
+    const validJson = await this.validateJsonFile(file);
+    try {
+      const jsonData = JSON.parse(file.buffer.toString('utf8'));
+      if (validJson.status === true) {
+        for (const data of jsonData) {
+          const valid = await this.validateUser(data);
+          if (valid.status === true) {
+            const exists = await this.prisma.users.findUnique({
+              where: { email: data.email },
+            });
+            if (exists) {
+              continue;
+            } else {
+              const user = {
+                name: data.name,
+                email: data.email,
+                location: data.location,
+                faceString: data.faceString,
+              };
+              await this.prisma.users.create({ data: user });
+            }
+          } else {
+            continue;
+          }
+          return validJson.message;
+        }
+      }
+    } catch (err) {
+      return validJson.message;
+    }
+    return validJson.message;
   }
 
   async updateFaceString(email: string, faceString: string) {
@@ -156,5 +202,42 @@ export class UsersService {
       where: { email },
       data: { faceString },
     });
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  async validateUser(user: UserDto) {
+    const isValidEmail = this.isValidEmail(user.email);
+    if (!isValidEmail) {
+      return { message: 'Email is not valid', status: false };
+    }
+    const exists = await this.prisma.users.findUnique({
+      where: { email: user.email },
+    });
+    const locations = await this.prisma.location.findMany();
+    if (exists) {
+      return { message: 'Email already exists', status: false };
+    }
+    if (!locations.find((loc) => loc.name === user.location)) {
+      return { message: 'Location does not exist', status: false };
+    }
+    if (user.location === '') {
+      return { message: 'Location cannot be empty', status: false };
+    }
+    if (user.email === '') {
+      return { message: 'Email cannot be empty', status: false };
+    }
+    if (user.name === '') {
+      return { message: 'Name cannot be empty', status: false };
+    }
+    const face = user.faceString;
+    const array = face.split(',');
+    if (array.length !== 512 || user.faceString === '') {
+      return { message: 'The face string is not valid', status: false };
+    }
+    return { message: 'Success', status: true };
   }
 }
