@@ -9,7 +9,7 @@ export class AttendancesService {
   constructor(
     private prisma: PrismaService,
     private hist: HistoricAttendanceService,
-  ) {}
+  ) { }
 
   async create(attendance: AttendanceDto) {
     const students = await this.prisma.users.findMany();
