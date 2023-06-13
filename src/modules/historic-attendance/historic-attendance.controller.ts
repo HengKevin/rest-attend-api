@@ -31,7 +31,11 @@ export class HistoricAttendanceController {
 
   @Get('/date/:date')
   findAllByDate(@Param('date') date: string) {
-    return this.historicAttendanceService.findAllByDate(date);
+    try {
+      return this.historicAttendanceService.findAllByDate(date);
+    } catch (err) {
+      return { message: err.message, status: 400 };
+    }
   }
 
   @Get(':date/:userEmail')
@@ -39,10 +43,14 @@ export class HistoricAttendanceController {
     @Param('date') date: string,
     @Param('userEmail') userEmail: string,
   ) {
-    return this.historicAttendanceService.findAllByDateAndEmail(
-      date,
-      userEmail,
-    );
+    try {
+      return this.historicAttendanceService.findAllByDateAndEmail(
+        date,
+        userEmail,
+      );
+    } catch (err) {
+      return { message: err.message, status: 400 };
+    }
   }
 
   @Get('/location/date/status')
@@ -54,26 +62,30 @@ export class HistoricAttendanceController {
     @Query('location') location?: string,
     @Query('status') status?: string,
   ) {
-    if (date && location && status) {
-      return this.historicAttendanceService.filterStatusByLocationDate(
-        date,
-        location,
-        status,
-      );
-    } else if (date && location) {
-      return this.historicAttendanceService.findAllByLocationDate(
-        location,
-        date,
-      );
-    } else if (date && status) {
-      return this.historicAttendanceService.findAllByDateStatus(date, status);
-    } else if (location && status) {
-      return this.historicAttendanceService.findAllByLocationStatus(
-        location,
-        status,
-      );
-    } else {
-      return this.historicAttendanceService.findAllByDate(date);
+    try {
+      if (date && location && status) {
+        return this.historicAttendanceService.filterStatusByLocationDate(
+          date,
+          location,
+          status,
+        );
+      } else if (date && location) {
+        return this.historicAttendanceService.findAllByLocationDate(
+          location,
+          date,
+        );
+      } else if (date && status) {
+        return this.historicAttendanceService.findAllByDateStatus(date, status);
+      } else if (location && status) {
+        return this.historicAttendanceService.findAllByLocationStatus(
+          location,
+          status,
+        );
+      } else {
+        return this.historicAttendanceService.findAllByDate(date);
+      }
+    } catch (err) {
+      return { message: err.message, status: 400 };
     }
   }
 
@@ -114,7 +126,11 @@ export class HistoricAttendanceController {
 
   @Get('/attendance/location/date/:date')
   summaryByLocationDate(@Param('date') date: string) {
-    return this.historicAttendanceService.summaryByLocationDate(date);
+    try {
+      return this.historicAttendanceService.summaryByLocationDate(date);
+    } catch (err) {
+      return { message: err.message, status: 400 };
+    }
   }
 
   @Get(':userEmail')
@@ -127,10 +143,14 @@ export class HistoricAttendanceController {
     @Param('date') date: string,
     @Param('userEmail') userEmail: string,
   ) {
-    return this.historicAttendanceService.findOneByDateAndEmail(
-      date,
-      userEmail,
-    );
+    try {
+      return this.historicAttendanceService.findOneByDateAndEmail(
+        date,
+        userEmail,
+      );
+    } catch (err) {
+      return { message: err.message, status: 400 };
+    }
   }
 
   @Get('/attendance/excel/location/date')
@@ -149,6 +169,10 @@ export class HistoricAttendanceController {
         endDate,
         location,
       );
+
+    if (typeof exportPath === 'string') {
+      return res.status(400).json({ error: exportPath });
+    }
 
     fs.promises
       .stat(exportPath)
@@ -171,26 +195,29 @@ export class HistoricAttendanceController {
   @Get('/attendance/excel/:date')
   @ApiQuery({ name: 'date', required: false })
   async excel(@Query('date') date: string, @Res() res: Response) {
-    const exportPath = await this.historicAttendanceService.exportDataByDate(
-      date,
-    );
-
-    fs.promises
-      .stat(exportPath)
-      .then((stat) => {
-        if (stat.isFile()) {
-          res.download(exportPath, 'attendance.xlsx', (err) => {
-            if (err) {
-              console.log(err);
-            } else {
-              fs.unlinkSync(exportPath);
-            }
-          });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    try {
+      const exportPath = await this.historicAttendanceService.exportDataByDate(
+        date,
+      );
+      fs.promises
+        .stat(exportPath)
+        .then((stat) => {
+          if (stat.isFile()) {
+            res.download(exportPath, 'attendance.xlsx', (err) => {
+              if (err) {
+                return res.status(400).json({ error: err.message });
+              } else {
+                fs.unlinkSync(exportPath);
+              }
+            });
+          }
+        })
+        .catch((err) => {
+          return res.status(400).json({ error: err.message });
+        });
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
   }
 
   @Get('/attendance/excel/month/location')
@@ -209,6 +236,10 @@ export class HistoricAttendanceController {
         year,
         location,
       );
+
+    if (typeof exportPath === 'string') {
+      return res.status(400).json({ error: exportPath });
+    }
     fs.promises
       .stat(exportPath)
       .then((stat) => {

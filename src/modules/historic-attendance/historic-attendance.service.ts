@@ -49,6 +49,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDateAndEmail(date: string, userEmail: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found in this date';
+    }
+    const validDate = this.validateDate(date);
+    if (!validDate) {
+      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+    }
     if (date === '' || userEmail === '') {
       return 'Date and Email must not be empty';
     }
@@ -70,6 +78,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDate(date: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found in this date';
+    }
+    const validDate = this.validateDate(date);
+    if (!validDate) {
+      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+    }
     if (date === '') {
       return 'Date must not be empty';
     }
@@ -123,12 +139,24 @@ export class HistoricAttendanceService {
   }
 
   async findOneByDateAndEmail(date: string, userEmail: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist';
+    }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ date: date }, { userEmail: userEmail }] },
     });
   }
 
   async findAllByDateStatus(date: string, status: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
     const validDate = await this.validateDate(date);
     if (!validDate) {
       return 'Date does not exist';
@@ -143,6 +171,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDateStatusPage(date: string, status: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist';
+    }
     const total = await this.prisma.historicAtt.count({
       where: { AND: [{ date: date }, { attendanceStatus: status }] },
     });
@@ -197,6 +233,14 @@ export class HistoricAttendanceService {
     userEmail: string,
     location: string,
   ) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist';
+    }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
@@ -216,6 +260,10 @@ export class HistoricAttendanceService {
   }
 
   async summaryByLocationDate(date: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
     const validDate = await this.validateDate(date);
     if (!validDate) {
       return 'Date does not exist';
@@ -247,6 +295,14 @@ export class HistoricAttendanceService {
     location?: string,
     status?: string,
   ) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist';
+    }
     return await this.prisma.historicAtt.findMany({
       where: {
         AND: [
@@ -285,6 +341,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocationDate(location: string, date: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist';
+    }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
@@ -295,6 +359,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocationDatePage(location: string, date: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist';
+    }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
@@ -315,6 +387,14 @@ export class HistoricAttendanceService {
   }
 
   async exportDataByDate(date: string) {
+    const exist = await this.checkDateExistance(date);
+    if (!exist) {
+      return 'No Data found for this date';
+    }
+    const validDate = await this.validateDate(date);
+    if (!validDate || date === '') {
+      return 'Date does not exist or cannot be empty';
+    }
     const data = await this.prisma.historicAtt.findMany({
       where: { date: date },
     });
@@ -539,7 +619,18 @@ export class HistoricAttendanceService {
     return false;
   }
 
+  async checkDateExistance(date: string): Promise<boolean> {
+    const res = await this.prisma.historicAtt.count({
+      where: { date: date },
+    });
+    return res > 0;
+  }
+
   async validHist(dto: HistoricAttDto) {
+    const exist = await this.checkDateExistance(dto.date);
+    if (!exist) {
+      return { message: 'No Data found for this date', status: false };
+    }
     const validDate = this.validateDate(dto.date);
     if (!validDate) {
       return {
