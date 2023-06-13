@@ -13,6 +13,10 @@ export class HistoricAttendanceService {
   ) {}
 
   async create(history: HistoricAttDto) {
+    const valid = await this.validHist(history);
+    if (valid.status === false) {
+      return valid.message;
+    }
     return await this.prisma.historicAtt.create({ data: { ...history } });
   }
 
@@ -33,16 +37,46 @@ export class HistoricAttendanceService {
   }
 
   async findAllByUserEmail(userEmail: string) {
+    const emailFormat = this.isValidEmail(userEmail);
+    if (!emailFormat) {
+      return 'Email is not valid';
+    }
+    const validEmail = await this.validateUserEmail(userEmail);
+    if (!validEmail) {
+      return 'Email does not exist';
+    }
     return await this.prisma.historicAtt.findMany({ where: { userEmail } });
   }
 
   async findAllByDateAndEmail(date: string, userEmail: string) {
+    if (date === '' || userEmail === '') {
+      return 'Date and Email must not be empty';
+    }
+    const emailFormat = this.isValidEmail(userEmail);
+    if (!emailFormat) {
+      return 'Email is not valid';
+    }
+    const valid = await this.validateDate(date);
+    if (!valid) {
+      return 'Date does not exist';
+    }
+    const validEmail = await this.validateUserEmail(userEmail);
+    if (!validEmail) {
+      return 'Email does not exist';
+    }
     return await this.prisma.historicAtt.findUnique({
       where: { date_userEmail: { date, userEmail } },
     });
   }
 
   async findAllByDate(date: string) {
+    if (date === '') {
+      return 'Date must not be empty';
+    }
+    const valid = await this.validateDate(date);
+    if (!valid) {
+      return 'Date does not exist';
+    }
     return await this.prisma.historicAtt.findMany({ where: { date } });
   }
 
@@ -61,10 +95,24 @@ export class HistoricAttendanceService {
   }
 
   async delete(id: number) {
+    if (id === null || id === undefined) {
+      return 'Id must not be empty';
+    }
+    const exist = await this.prisma.historicAtt.findUnique({ where: { id } });
+    if (!exist) {
+      return 'Historic Attendance does not exist';
+    }
     return await this.prisma.historicAtt.delete({ where: { id } });
   }
 
   async findAllByLocation(location: string) {
+    if (location === '') {
+      return 'Location must not be empty';
+    }
+    const special = this.containsSpecialCharacter(location);
+    if (special) {
+      return 'Location must not contain special characters';
+    }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
@@ -81,6 +129,14 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDateStatus(date: string, status: string) {
+    const validDate = await this.validateDate(date);
+    if (!validDate) {
+      return 'Date does not exist';
+    }
+    const validStatus = await this.isValidStatus(status);
+    if (!validStatus) {
+      return 'Status does not exist';
+    }
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ date: date }, { attendanceStatus: status }] },
     });
@@ -106,6 +162,10 @@ export class HistoricAttendanceService {
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
+    }
+    const validStatus = await this.isValidStatus(status);
+    if (!validStatus) {
+      return 'Status does not exist';
     }
     return await this.prisma.historicAtt.findMany({
       where: { AND: [{ location: location }, { attendanceStatus: status }] },
@@ -156,6 +216,10 @@ export class HistoricAttendanceService {
   }
 
   async summaryByLocationDate(date: string) {
+    const validDate = await this.validateDate(date);
+    if (!validDate) {
+      return 'Date does not exist';
+    }
     const location = await this.location.findAll();
     const summArr = [];
     for (const loc of location) {
@@ -263,9 +327,17 @@ export class HistoricAttendanceService {
     endDate: string,
     location: string,
   ) {
+    if (location === '') {
+      return 'Location must not be empty';
+    }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
+    }
+    const validStartDate = await this.validateDate(startDate);
+    const validEndDate = await this.validateDate(endDate);
+    if (!validStartDate || !validEndDate) {
+      return 'Date does not exist';
     }
     const data = [];
     const users = await this.prisma.users.findMany({
@@ -334,9 +406,20 @@ export class HistoricAttendanceService {
     year: number,
     location: string,
   ) {
+    if (typeof month !== 'number' || typeof year !== 'number') {
+      return 'Month or year must a number';
+    }
+    if (location === '') {
+      return 'Location cannot be empty';
+    }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
       return 'Location does not exist';
+    }
+    const validMonth = await this.validMonth(month);
+    const validYear = await this.validYear(year);
+    if (!validMonth || !validYear) {
+      return 'Month or year does not exist';
     }
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
@@ -390,5 +473,101 @@ export class HistoricAttendanceService {
       return true;
     }
     return false;
+  }
+
+  validMonth(month: number): boolean {
+    if (month < 1 || month > 12) {
+      return false;
+    }
+    return true;
+  }
+
+  validYear(year: number): boolean {
+    if (year < 1900 || year > 2100) {
+      return false;
+    }
+    return true;
+  }
+  hasTimeFormat(str: string): boolean {
+    const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+    return timeRegex.test(str);
+  }
+
+  isValidStatus(status: string): boolean {
+    const statusRegex = /^(Early|Absent|Late)$/;
+    return statusRegex.test(status);
+  }
+
+  isValidCheckOutStatus(checkOutStatus: string): boolean {
+    const statusRegex = /^(Leave On Time|Leave Early)$/;
+    return statusRegex.test(checkOutStatus);
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  containsSpecialCharacter(input: string): boolean {
+    const specialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
+    return specialCharacterPattern.test(input);
+  }
+
+  validateDate(date: string) {
+    const datePattern = /^([0-3][0-9])-([0-1][0-9])-([0-9]{4})$/;
+    const match = datePattern.exec(date);
+
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10);
+
+      if (day <= 31 && month <= 12) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async validateUserEmail(userEmail: string) {
+    const exists = await this.prisma.users.findUnique({
+      where: { email: userEmail },
+    });
+    if (exists) {
+      return true;
+    }
+    return false;
+  }
+
+  async validHist(dto: HistoricAttDto) {
+    const validDate = this.validateDate(dto.date);
+    if (!validDate) {
+      return {
+        message: 'Date format is invalid, must be in this format DD-MM-YYYY',
+        status: false,
+      };
+    }
+    const validEmail = await this.validateUserEmail(dto.userEmail);
+    if (!validEmail) {
+      return { message: 'Invalid email', status: false };
+    }
+    const validLoc = await this.validateLocation(dto.location);
+    if (!validLoc) {
+      return { message: 'Location does not exist', status: false };
+    }
+    const validStatus = this.isValidStatus(dto.attendanceStatus);
+    if (!validStatus) {
+      return { message: 'Invalid status', status: false };
+    }
+    const validCheckOutStatus = this.isValidCheckOutStatus(dto.checkOutStatus);
+    if (!validCheckOutStatus) {
+      return { message: 'Invalid check out status', status: false };
+    }
+    const validCheckIn = this.hasTimeFormat(dto.checkIn);
+    const validCheckOut = this.hasTimeFormat(dto.checkOut);
+    if (!validCheckIn || !validCheckOut) {
+      return { message: 'Time format is invalid', status: false };
+    }
+    return { message: 'Valid', status: true };
   }
 }

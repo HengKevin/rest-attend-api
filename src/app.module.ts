@@ -25,6 +25,10 @@ import { MulterModule } from '@nestjs/platform-express';
     AdminsModule,
     MulterModule.register({
       dest: './uploads',
+      limits: {
+        // set the limit to 2mb
+        fileSize: 2 * 1024 * 1024,
+      },
     }),
   ],
   controllers: [AppController],

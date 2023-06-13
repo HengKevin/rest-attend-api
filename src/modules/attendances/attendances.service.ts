@@ -44,7 +44,7 @@ export class AttendancesService {
   async findAllByUserEmail(userEmail: string) {
     const validEmail = await this.validateUserEmail(userEmail);
     if (!validEmail) {
-      return 'Invalid email';
+      return { message: 'Invalid email', status: 400 };
     } else {
       return await this.prisma.attendances.findMany({ where: { userEmail } });
     }
@@ -53,7 +53,10 @@ export class AttendancesService {
   async findAllByDate(date: string) {
     const validDate = this.validateDate(date);
     if (!validDate) {
-      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+      return {
+        message: 'Date format is invalid, must be in this format DD-MM-YYYY',
+        status: 400,
+      };
     }
     return await this.prisma.attendances.findMany({ where: { date } });
   }
@@ -139,15 +142,18 @@ export class AttendancesService {
   ) {
     const validLoc = await this.validateLocation(location);
     if (validLoc) {
-      return 'Location does not exist';
+      return { message: 'Location does not exist', status: 400 };
     }
     const validDate = this.validateDate(date);
     if (!validDate) {
-      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+      return {
+        message: 'Date format is invalid, must be in this format DD-MM-YYYY',
+        status: 400,
+      };
     }
     const validEmail = await this.validateUserEmail(userEmail);
     if (!validEmail) {
-      return 'Invalid email';
+      return { message: 'Invalid email', status: 400 };
     }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ date }, { location }, { userEmail }] },
@@ -157,11 +163,14 @@ export class AttendancesService {
   async findAllByDateAndUserEmail(date: string, userEmail: string) {
     const validEmail = await this.validateUserEmail(userEmail);
     if (!validEmail) {
-      return 'Invalid email';
+      return { message: 'Invalid email', status: 400 };
     }
     const validDate = this.validateDate(date);
     if (!validDate) {
-      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+      return {
+        message: 'Date format is invalid, must be in this format DD-MM-YYYY',
+        status: 400,
+      };
     }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ date }, { userEmail }] },
@@ -171,11 +180,11 @@ export class AttendancesService {
   async findAllByUserEmailAndLocation(userEmail: string, location: string) {
     const validEmail = await this.validateUserEmail(userEmail);
     if (!validEmail) {
-      return 'Invalid Email';
+      return { message: 'Invalid Email', status: 400 };
     }
     const validLoc = await this.validateLocation(location);
     if (validLoc) {
-      return 'Location does not exist';
+      return { message: 'Location does not exist', status: 400 };
     }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ userEmail }, { location }] },
@@ -185,11 +194,14 @@ export class AttendancesService {
   async findAllByLocationAndDate(location: string, date: string) {
     const validLoc = await this.validateLocation(location);
     if (validLoc) {
-      return 'Location does not exist';
+      return { message: 'Location does not exist', status: 400 };
     }
     const validDate = this.validateDate(date);
     if (!validDate) {
-      return 'Date format is invalid, must be in this format DD-MM-YYYY';
+      return {
+        message: 'Date format is invalid, must be in this format DD-MM-YYYY',
+        status: 400,
+      };
     }
     return await this.prisma.attendances.findMany({
       where: { AND: [{ location: location }, { date: date }] },
@@ -199,7 +211,7 @@ export class AttendancesService {
   async findAllByLocation(location: string) {
     const validLoc = await this.validateLocation(location);
     if (validLoc) {
-      return 'Location does not exist';
+      return { message: 'Location does not exist', status: 400 };
     }
     return await this.prisma.attendances.findMany({
       where: { location: location },
@@ -209,7 +221,7 @@ export class AttendancesService {
   async deleteOne(id: number) {
     const exists = await this.prisma.attendances.findUnique({ where: { id } });
     if (!exists) {
-      return 'Attendance does not exist';
+      return { message: 'Attendance does not exist', status: 400 };
     }
     return await this.prisma.attendances.delete({ where: { id } });
   }

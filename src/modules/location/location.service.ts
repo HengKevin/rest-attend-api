@@ -7,6 +7,12 @@ export class LocationService {
   constructor(private prisma: PrismaService) {}
 
   async create(location: LocationDto) {
+    if (this.containsSpecialCharacter(location.name)) {
+      return {
+        status: false,
+        message: 'Location name should not contain special characters',
+      };
+    }
     return await this.prisma.location.create({ data: { ...location } });
   }
 
@@ -39,5 +45,10 @@ export class LocationService {
 
   async delete(id: number) {
     return await this.prisma.location.delete({ where: { id } });
+  }
+
+  containsSpecialCharacter(input: string): boolean {
+    const specialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
+    return specialCharacterPattern.test(input);
   }
 }
