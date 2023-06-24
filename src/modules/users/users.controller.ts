@@ -23,7 +23,8 @@ import { UsernameDto } from './dto/username.dto';
 import { UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FaceStringDto } from './dto/faceString.dto';
-import { FileSizeInterceptor } from '../utils/FileSizeInterceptor';
+import { Multer } from 'multer';
+import { Express } from 'express';
 
 @Controller('users')
 @ApiTags('users')
@@ -56,11 +57,8 @@ export class UsersController {
       },
     },
   })
-  @UseInterceptors(
-    FileInterceptor('file'),
-    new FileSizeInterceptor(2 * 1024 * 1024),
-  )
-  async registerJson(@UploadedFile() file) {
+  @UseInterceptors(FileInterceptor('file'))
+  async registerJson(@UploadedFile() file: Multer.File) {
     const jsonData = await this.userService.readFromJson(file);
     return jsonData;
   }

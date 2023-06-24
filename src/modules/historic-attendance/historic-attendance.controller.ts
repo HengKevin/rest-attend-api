@@ -81,6 +81,10 @@ export class HistoricAttendanceController {
           location,
           status,
         );
+      } else if (location) {
+        return this.historicAttendanceService.findAllByLocation(location);
+      } else if (status) {
+        return this.historicAttendanceService.findAllByStatus(status);
       } else {
         return this.historicAttendanceService.findAllByDate(date);
       }

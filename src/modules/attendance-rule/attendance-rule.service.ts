@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceRuleDto } from './dto/attendance-rule.dto';
 import { UpdateAttendanceRuleDto } from './dto/update-attendance-rule.dto';
@@ -18,7 +18,7 @@ export class AttendanceRuleService {
         return await this.prisma.attendanceRule.create({ data: { ...rule } });
       }
     }
-    return valid.message;
+    throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
   }
 
   hasTimeFormat(str: string): boolean {
@@ -31,13 +31,17 @@ export class AttendanceRuleService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.attendanceRule.findUnique({ where: { id } });
+    const rule = await this.prisma.attendanceRule.findUnique({ where: { id } });
+    if (!rule) {
+      throw new HttpException('Attendance Rule does not exist', 400);
+    }
+    return rule;
   }
 
   async update(id: number, rule: UpdateAttendanceRuleDto) {
     const valid = await this.validateRule(rule);
     if (valid.status === false) {
-      return valid.message;
+      throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
     }
     return await this.prisma.attendanceRule.update({
       where: { id },
@@ -50,7 +54,7 @@ export class AttendanceRuleService {
       where: { id },
     });
     if (!exists) {
-      return 'Attendance Rule does not exist';
+      throw new HttpException('Attendance Rule does not exist', 400);
     }
     return await this.prisma.attendanceRule.delete({ where: { id } });
   }

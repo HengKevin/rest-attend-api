@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationService } from '../location/location.service';
 import { Multer } from 'multer';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 
 export type Admin = any;
 @Injectable()
@@ -38,7 +38,7 @@ export class UsersService {
         },
       });
     }
-    return valid.message;
+    throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
   }
 
   async bulkCreate(users: UserDto[]) {
@@ -107,7 +107,7 @@ export class UsersService {
   async deleteOne(id: number) {
     const exist = await this.prisma.users.findUnique({ where: { id } });
     if (!exist) {
-      return 'User not found';
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.users.delete({ where: { id } });
   }
@@ -116,19 +116,13 @@ export class UsersService {
     const exist = await this.prisma.users.findUnique({ where: { id } });
     const special = this.containsSpecialCharacter(name);
     if (!exist) {
-      return 'User not found';
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    if (
-      name === '' ||
-      special === true ||
-      name === 'null' ||
-      name === 'undefined' ||
-      name === 'NaN'
-    ) {
-      return 'Name cannot be empty or contain special characters';
+    if (name === '' || special === true || name.toLowerCase() === 'null') {
+      throw new HttpException('Name is not valid', HttpStatus.BAD_REQUEST);
     }
     if (this.isStringLengthValid(name, 50) === false) {
-      return 'Name cannot be longer than 50 characters';
+      throw new HttpException('Name is too long', HttpStatus.BAD_REQUEST);
     }
     return await this.prisma.users.update({
       where: { id },
@@ -147,57 +141,63 @@ export class UsersService {
 
   async validateJsonFile(file: Multer.File) {
     try {
-      const fileContents = fs.readFileSync(file);
-      const jsonData = JSON.parse(fileContents.toString('utf8'));
+      const jsonData = JSON.parse(file.buffer.toString('utf8'));
 
       if (
         !Array.isArray(jsonData) ||
         jsonData.length === 0 ||
         !jsonData.every((obj) => typeof obj === 'object')
       ) {
-        return { message: 'File is not valid JSON', status: false };
+        return { message: 'Not the right data', status: false };
       }
       return { message: 'File is valid JSON', status: true };
     } catch (err) {
-      return { message: 'File is not valid JSON', status: false };
+      return {
+        message: err.message,
+        status: false,
+      };
     }
   }
 
   async readFromJson(file: Multer.File): Promise<any> {
     const validJson = await this.validateJsonFile(file);
-    try {
-      const jsonData = JSON.parse(file.buffer.toString('utf8'));
-      if (validJson.status === true) {
-        for (const data of jsonData) {
-          const valid = await this.validateUser(data);
-          if (valid.status === true) {
-            const exists = await this.prisma.users.findUnique({
-              where: { email: data.email },
-            });
-            if (exists) {
-              continue;
-            } else {
-              const user = {
-                name: data.name,
-                email: data.email,
-                location: data.location,
-                faceString: data.faceString,
-              };
-              await this.prisma.users.create({ data: user });
-            }
-          } else {
-            continue;
-          }
-          return validJson.message;
-        }
-      }
-    } catch (err) {
-      return validJson.message;
+    if (validJson.status === false) {
+      throw new HttpException(validJson.message, HttpStatus.BAD_REQUEST);
     }
-    return validJson.message;
+    const jsonData = JSON.parse(file.buffer.toString('utf8'));
+    for (const data of jsonData) {
+      const valid = await this.validateUser(data);
+      if (valid.status === true) {
+        const exists = await this.prisma.users.findUnique({
+          where: { email: data.email },
+        });
+        if (exists) {
+          continue;
+        } else {
+          const user = {
+            name: data.name,
+            email: data.email,
+            location: data.location,
+            faceString: data.faceString,
+          };
+          await this.prisma.users.create({ data: user });
+        }
+      } else {
+        continue;
+      }
+      throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
+    }
+    return {
+      data: jsonData,
+      status: HttpStatus.OK,
+    };
   }
 
   async updateFaceString(email: string, faceString: string) {
+    const array = faceString.split(',');
+    if (array.length !== 512 || faceString === '') {
+      return { message: 'The face string is not valid', status: false };
+    }
     return await this.prisma.users.update({
       where: { email },
       data: { faceString },

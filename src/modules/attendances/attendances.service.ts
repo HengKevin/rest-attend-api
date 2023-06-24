@@ -267,22 +267,22 @@ export class AttendancesService {
 
   async validateAttendance(dto: AttendanceDto) {
     const validDate = this.validateDate(dto.date);
-    if (!validDate) {
+    if (!validDate || dto.date === '') {
       return {
         message: 'Date format is invalid, must be in this format DD-MM-YYYY',
         status: false,
       };
     }
     const validEmail = await this.validateUserEmail(dto.userEmail);
-    if (!validEmail) {
+    if (!validEmail || dto.userEmail === '') {
       return { message: 'Invalid email', status: false };
     }
     const validLoc = await this.validateLocation(dto.location);
-    if (validLoc) {
+    if (validLoc || dto.location === '') {
       return { message: 'Location does not exist', status: false };
     }
     const validTime = this.hasTimeFormat(dto.time);
-    if (!validTime) {
+    if (!validTime || dto.time === '') {
       return { message: 'Time format is invalid', status: false };
     }
     return { message: 'Valid', status: true };

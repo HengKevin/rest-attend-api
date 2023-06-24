@@ -138,6 +138,17 @@ export class HistoricAttendanceService {
     });
   }
 
+  async findAllByStatus(status: string) {
+    const validStatus = await this.isValidStatus(status.toLowerCase());
+    if (!validStatus) {
+      return 'Status does not exist';
+    }
+    const stat = status[0].toUpperCase() + status.slice(1);
+    return await this.prisma.historicAtt.findMany({
+      where: { attendanceStatus: stat },
+    });
+  }
+
   async findOneByDateAndEmail(date: string, userEmail: string) {
     const exist = await this.checkDateExistance(date);
     if (!exist) {
@@ -161,7 +172,7 @@ export class HistoricAttendanceService {
     if (!validDate) {
       return 'Date does not exist';
     }
-    const validStatus = await this.isValidStatus(status);
+    const validStatus = await this.isValidStatus(status.toLowerCase());
     if (!validStatus) {
       return 'Status does not exist';
     }
@@ -574,12 +585,12 @@ export class HistoricAttendanceService {
   }
 
   isValidStatus(status: string): boolean {
-    const statusRegex = /^(Early|Absent|Late)$/;
+    const statusRegex = /^(early|absent|late)$/;
     return statusRegex.test(status);
   }
 
   isValidCheckOutStatus(checkOutStatus: string): boolean {
-    const statusRegex = /^(Leave On Time|Leave Early)$/;
+    const statusRegex = /^(leave on time|leave early)$/;
     return statusRegex.test(checkOutStatus);
   }
 
@@ -646,11 +657,13 @@ export class HistoricAttendanceService {
     if (!validLoc) {
       return { message: 'Location does not exist', status: false };
     }
-    const validStatus = this.isValidStatus(dto.attendanceStatus);
+    const validStatus = this.isValidStatus(dto.attendanceStatus.toLowerCase());
     if (!validStatus) {
       return { message: 'Invalid status', status: false };
     }
-    const validCheckOutStatus = this.isValidCheckOutStatus(dto.checkOutStatus);
+    const validCheckOutStatus = this.isValidCheckOutStatus(
+      dto.checkOutStatus.toLowerCase(),
+    );
     if (!validCheckOutStatus) {
       return { message: 'Invalid check out status', status: false };
     }
