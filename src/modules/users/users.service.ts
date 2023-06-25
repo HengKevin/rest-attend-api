@@ -3,7 +3,6 @@ import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationService } from '../location/location.service';
 import { Multer } from 'multer';
-import { readFileSync } from 'fs';
 
 export type Admin = any;
 @Injectable()
@@ -188,6 +187,7 @@ export class UsersService {
       throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
     }
     return {
+      message: 'Success',
       data: jsonData,
       status: HttpStatus.OK,
     };

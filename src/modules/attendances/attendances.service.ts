@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceDto } from './dto/attendance.dto';
 import { HistoricAttendanceService } from '../historic-attendance/historic-attendance.service';
@@ -15,7 +15,10 @@ export class AttendancesService {
     const students = await this.prisma.users.findMany();
     const validateAttendance = await this.validateAttendance(attendance);
     if (validateAttendance.status === false) {
-      return validateAttendance.message;
+      throw new HttpException(
+        validateAttendance.message,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     for (const student of students) {
       const exist = await this.hist.findAllByDateAndEmail(
