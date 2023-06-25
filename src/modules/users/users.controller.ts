@@ -58,8 +58,7 @@ export class UsersController {
   })
   @UseInterceptors(FileInterceptor('file'))
   async registerJson(@UploadedFile() file: Multer.File) {
-    const jsonData = await this.userService.readFromJson(file);
-    return jsonData;
+    return await this.userService.readFromJson(file);
   }
 
   @Get('location/users')
