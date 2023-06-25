@@ -254,10 +254,6 @@ export class HistoricAttendanceController {
         year,
         location,
       );
-
-    if (typeof exportPath === 'string') {
-      return res.status(400).json({ error: exportPath });
-    }
     fs.promises
       .stat(exportPath)
       .then((stat) => {

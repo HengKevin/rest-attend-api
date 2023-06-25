@@ -23,10 +23,13 @@ export class AttendanceRuleController {
     return this.attendanceRuleService.create(attendanceRuleDto);
   }
 
-  @Patch()
+  @Patch('/:id')
   @ApiAcceptedResponse({ type: AttendanceRuleService })
-  update(@Body() attendanceRuleDto: AttendanceRuleDto) {
-    return this.attendanceRuleService.update(1, attendanceRuleDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() attendanceRuleDto: AttendanceRuleDto,
+  ) {
+    return this.attendanceRuleService.update(id, attendanceRuleDto);
   }
 
   @Delete()

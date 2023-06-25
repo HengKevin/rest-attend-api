@@ -15,7 +15,7 @@ export class HistoricAttendanceService {
   async create(history: HistoricAttDto) {
     const valid = await this.validHist(history);
     if (valid.status === false) {
-      return valid.message;
+      throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
     }
     return await this.prisma.historicAtt.create({ data: { ...history } });
   }
@@ -49,29 +49,6 @@ export class HistoricAttendanceService {
   }
 
   async findAllByDateAndEmail(date: string, userEmail: string) {
-    const exist = await this.checkDateExistance(date);
-    if (!exist) {
-      return 'No Data found in this date';
-    }
-    const validDate = this.validateDate(date);
-    if (!validDate) {
-      return 'Date format is invalid, must be in this format DD-MM-YYYY';
-    }
-    if (date === '' || userEmail === '') {
-      return 'Date and Email must not be empty';
-    }
-    const emailFormat = this.isValidEmail(userEmail);
-    if (!emailFormat) {
-      return 'Email is not valid';
-    }
-    const valid = await this.validateDate(date);
-    if (!valid) {
-      return 'Date does not exist';
-    }
-    const validEmail = await this.validateUserEmail(userEmail);
-    if (!validEmail) {
-      return 'Email does not exist';
-    }
     return await this.prisma.historicAtt.findUnique({
       where: { date_userEmail: { date, userEmail } },
     });
@@ -244,18 +221,6 @@ export class HistoricAttendanceService {
     userEmail: string,
     location: string,
   ) {
-    const exist = await this.checkDateExistance(date);
-    if (!exist) {
-      return 'No Data found for this date';
-    }
-    const validDate = await this.validateDate(date);
-    if (!validDate || date === '') {
-      return 'Date does not exist';
-    }
-    const validLoc = await this.validateLocation(location);
-    if (!validLoc) {
-      return 'Location does not exist';
-    }
     return await this.prisma.historicAtt.create({
       data: {
         date: date,
@@ -641,10 +606,6 @@ export class HistoricAttendanceService {
   }
 
   async validHist(dto: HistoricAttDto) {
-    const exist = await this.checkDateExistance(dto.date);
-    if (!exist) {
-      return { message: 'No Data found for this date', status: false };
-    }
     const validDate = this.validateDate(dto.date);
     if (!validDate) {
       return {
@@ -659,21 +620,6 @@ export class HistoricAttendanceService {
     const validLoc = await this.validateLocation(dto.location);
     if (!validLoc) {
       return { message: 'Location does not exist', status: false };
-    }
-    const validStatus = this.isValidStatus(dto.attendanceStatus.toLowerCase());
-    if (!validStatus) {
-      return { message: 'Invalid status', status: false };
-    }
-    const validCheckOutStatus = this.isValidCheckOutStatus(
-      dto.checkOutStatus.toLowerCase(),
-    );
-    if (!validCheckOutStatus) {
-      return { message: 'Invalid check out status', status: false };
-    }
-    const validCheckIn = this.hasTimeFormat(dto.checkIn);
-    const validCheckOut = this.hasTimeFormat(dto.checkOut);
-    if (!validCheckIn || !validCheckOut) {
-      return { message: 'Time format is invalid', status: false };
     }
     return { message: 'Valid', status: true };
   }

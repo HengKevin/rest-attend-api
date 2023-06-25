@@ -21,6 +21,18 @@ export class AttendanceRuleService {
     throw new HttpException(valid.message, HttpStatus.BAD_REQUEST);
   }
 
+  async newRule(rule: AttendanceRuleDto) {
+    const valid = await this.validateRule(rule);
+    if (valid.status === true) {
+      const exist = await this.prisma.attendanceRule.findMany();
+      if (exist.length > 0) {
+        return this.update(exist[0].id, rule);
+      } else {
+        return await this.prisma.attendanceRule.create({ data: { ...rule } });
+      }
+    }
+  }
+
   hasTimeFormat(str: string): boolean {
     const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
     return timeRegex.test(str);
