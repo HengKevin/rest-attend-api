@@ -24,7 +24,6 @@ import { UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FaceStringDto } from './dto/faceString.dto';
 import { Multer } from 'multer';
-import { Express } from 'express';
 
 @Controller('users')
 @ApiTags('users')

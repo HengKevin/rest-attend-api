@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExcelService } from '../excel/excel.service';
 import { LocationService } from '../location/location.service';
@@ -122,16 +122,16 @@ export class HistoricAttendanceService {
   }
 
   async findAllByLocation(location: string) {
-    if (location === '') {
-      return 'Location must not be empty';
-    }
     const special = this.containsSpecialCharacter(location);
     if (special) {
-      return 'Location must not contain special characters';
+      throw new HttpException(
+        'Location contains special character',
+        HttpStatus.NOT_FOUND,
+      );
     }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
-      return 'Location does not exist';
+      throw new HttpException('Location is invalid', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.historicAtt.findMany({
       where: { location: location },
@@ -419,16 +419,19 @@ export class HistoricAttendanceService {
     location: string,
   ) {
     if (location === '') {
-      return 'Location must not be empty';
+      throw new HttpException(
+        'Location must not be empty',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const validLoc = await this.validateLocation(location);
     if (!validLoc) {
-      return 'Location does not exist';
+      throw new HttpException('Location does not exist', HttpStatus.NOT_FOUND);
     }
     const validStartDate = await this.validateDate(startDate);
     const validEndDate = await this.validateDate(endDate);
     if (!validStartDate || !validEndDate) {
-      return 'Date does not exist';
+      throw new HttpException('Date does not exist', HttpStatus.NOT_FOUND);
     }
     const data = [];
     const users = await this.prisma.users.findMany({
@@ -497,7 +500,7 @@ export class HistoricAttendanceService {
     year: number,
     location: string,
   ) {
-    if (typeof month !== 'number' || typeof year !== 'number') {
+    if (isNaN(month) || isNaN(year)) {
       return 'Month or year must a number';
     }
     if (location === '') {

@@ -1,4 +1,10 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Res,
+} from '@nestjs/common';
 import { Body, Delete, Param, Post, Query } from '@nestjs/common/decorators';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -27,6 +33,14 @@ export class HistoricAttendanceController {
   @Get('/location/:location')
   findAllByLocation(@Param('location') location: string) {
     return this.historicAttendanceService.findAllByLocation(location);
+  }
+
+  @Get('/location')
+  async handleEmptyLocation() {
+    throw new HttpException(
+      'Location must be provided',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   @Get('/date/:date')
@@ -225,9 +239,9 @@ export class HistoricAttendanceController {
   }
 
   @Get('/attendance/excel/month/location')
-  @ApiQuery({ name: 'month', required: false })
+  @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'location', required: false })
-  @ApiQuery({ name: 'year', required: false })
+  @ApiQuery({ name: 'year', required: false, type: Number })
   async excelByMonthLocation(
     @Query('month') month: number,
     @Query('year') year: number,
