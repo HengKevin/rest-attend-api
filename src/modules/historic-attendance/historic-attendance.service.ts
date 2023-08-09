@@ -36,10 +36,12 @@ export class HistoricAttendanceService {
     return await this.prisma.historicAtt.findMany({ where: { userEmail } });
   }
 
-  async findAllByDateAndEmail(date: string, userEmail: string) {
-    return await this.prisma.historicAtt.findUnique({
+  async findAllByDateAndEmail(date: string, userEmail: string) {    
+    const res = await this.prisma.historicAtt.findUnique({
       where: { date_userEmail: { date, userEmail } },
     });
+    console.log("res:", res);
+    return res
   }
 
   async findAllByDate(date: string) {
@@ -306,7 +308,7 @@ export class HistoricAttendanceService {
     year: number,
     location: string,
   ) {
-    const startDate = new Date(year, month - 1, 1);
+    const startDate = new Date(year, month - 1, 1);   // jan = 0, Feb=1, ....
     const endDate = new Date(year, month, 0);
 
     const day = startDate.getDate().toString().padStart(2, '0');

@@ -8,27 +8,27 @@ import { AttendanceDto } from './dto/attendance.dto';
 @Controller('attendances')
 @ApiTags('attendances')
 export class AttendancesController {
-  constructor(private readonly attendanceService: AttendancesService) {}
+  constructor(private readonly attendanceService: AttendancesService) { }
 
   @Get()
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'email', required: false })
   @ApiQuery({ name: 'location', required: false })
-  findAttendances(
+  async findAttendances(
     @Query('date') date?: string,
     @Query('email') email?: string,
     @Query('location') location?: string,
   ) {
     if (date && location) {
-      return this.attendanceService.findAllByLocationAndDate(location, date);
+      return await this.attendanceService.findAllByLocationAndDate(location, date);
     } else if (date) {
-      return this.attendanceService.findAllByDate(date);
+      return await this.attendanceService.findAllByDate(date);
     } else if (location) {
-      return this.attendanceService.findAllByLocation(location);
+      return await this.attendanceService.findAllByLocation(location);
     } else if (email) {
-      return this.attendanceService.findAllByUserEmail(email);
+      return await this.attendanceService.findAllByUserEmail(email);
     } else {
-      return this.attendanceService.findAll();
+      return await this.attendanceService.findAll();
     }
   }
 
@@ -42,12 +42,12 @@ export class AttendancesController {
   }
 
   @Post()
-  create(@Body() attendanceDto: AttendanceDto) {
-    return this.attendanceService.create(attendanceDto);
+  async create(@Body() attendanceDto: AttendanceDto) {
+    return await this.attendanceService.create(attendanceDto);
   }
 
   @Delete(':id')
-  deleteOne(@Param('id', ParseIntPipe) id: number) {
-    return this.attendanceService.deleteOne(id);
+  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.attendanceService.deleteOne(id);
   }
 }

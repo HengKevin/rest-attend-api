@@ -28,7 +28,9 @@ export class AdminsController {
   @Get('/email/:email')
   async findOneByEmail(@Param('email') email: string) {
     const foundEmail = await this.adminService.findOneByEmail(email);
-    return foundEmail;
+    // const {password, ...res} = foundEmail
+    // return res;
+    return foundEmail
   }
 
   @Get('/id/:id')

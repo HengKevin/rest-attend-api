@@ -12,7 +12,7 @@ import * as fs from 'fs';
 export class HistoricAttendanceController {
   constructor(
     private readonly historicAttendanceService: HistoricAttendanceService,
-  ) {}
+  ) { }
 
   @Get()
   async findAll() {
@@ -25,21 +25,25 @@ export class HistoricAttendanceController {
   }
 
   @Get('/location/:location')
-  findAllByLocation(@Param('location') location: string) {
-    return this.historicAttendanceService.findAllByLocation(location);
+  async findAllByLocation(@Param('location') location: string) {
+    return await this.historicAttendanceService.findAllByLocation(location);
   }
 
   @Get('/date/:date')
-  findAllByDate(@Param('date') date: string) {
-    return this.historicAttendanceService.findAllByDate(date);
+  async findAllByDate(@Param('date') date: string) {
+    return await this.historicAttendanceService.findAllByDate(date);
   }
 
   @Get(':date/:userEmail')
-  findAllByDateAndEmail(
+  async findAllByDateAndEmail(
     @Param('date') date: string,
     @Param('userEmail') userEmail: string,
   ) {
-    return this.historicAttendanceService.findAllByDateAndEmail(
+    console.log("date:", date);
+    console.log("userEmail:", userEmail);
+    
+
+    return await this.historicAttendanceService.findAllByDateAndEmail(
       date,
       userEmail,
     );
@@ -49,31 +53,31 @@ export class HistoricAttendanceController {
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'status', required: false })
-  findAllByLocationDateStatus(
+  async findAllByLocationDateStatus(
     @Query('date') date?: string,
     @Query('location') location?: string,
     @Query('status') status?: string,
   ) {
     if (date && location && status) {
-      return this.historicAttendanceService.filterStatusByLocationDate(
+      return await this.historicAttendanceService.filterStatusByLocationDate(
         date,
         location,
         status,
       );
     } else if (date && location) {
-      return this.historicAttendanceService.findAllByLocationDate(
+      return await this.historicAttendanceService.findAllByLocationDate(
         location,
         date,
       );
     } else if (date && status) {
-      return this.historicAttendanceService.findAllByDateStatus(date, status);
+      return await this.historicAttendanceService.findAllByDateStatus(date, status);
     } else if (location && status) {
-      return this.historicAttendanceService.findAllByLocationStatus(
+      return await this.historicAttendanceService.findAllByLocationStatus(
         location,
         status,
       );
     } else {
-      return this.historicAttendanceService.findAllByDate(date);
+      return await this.historicAttendanceService.findAllByDate(date);
     }
   }
 
@@ -127,6 +131,7 @@ export class HistoricAttendanceController {
     @Param('date') date: string,
     @Param('userEmail') userEmail: string,
   ) {
+
     return this.historicAttendanceService.findOneByDateAndEmail(
       date,
       userEmail,

@@ -30,13 +30,13 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: User })
+  @ApiCreatedResponse({ type: User }) // this ApiCreatedResponse for swagger
   create(@Body() userDto: UserDto) {
     return this.userService.create(userDto);
   }
 
   @Post('/bulk/create')
-  @ApiCreatedResponse({ type: User, isArray: true })
+  @ApiCreatedResponse({ type: User, isArray: true })  
   async bulkCreate(@Body() userDto: UserDto[]) {
     return await this.userService.bulkCreate(userDto);
   }

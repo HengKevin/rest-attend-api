@@ -10,17 +10,17 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private location: LocationService,
-  ) {}
+  ) { }
 
   private readonly admins = [
     {
       userId: 1,
-      email: 'ouk.sovannratana19@kit.edu.kh',
+      email: 'hengratanakvisoth20@kit.edu.kh',
       password: 'password',
     },
     {
       userId: 2,
-      email: 'heng.kevin19@kit.edu.kh',
+      email: 'haiseanghor20@kit.edu.kh',
       password: 'password',
     },
   ];

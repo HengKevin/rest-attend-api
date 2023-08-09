@@ -26,8 +26,8 @@ export class LocationController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.locationService.findOne(id);
+  async findOne(@Param('id') id: number) {
+    return await this.locationService.findOne(id);
   }
 
   @Patch(':id')
