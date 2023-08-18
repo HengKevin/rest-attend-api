@@ -97,11 +97,11 @@ export class UsersService {
     return await this.prisma.users.findUnique({ where: { email } });
   }
 
-  async findAdminByEmail(email: string): Promise<Admin | undefined> {
-    const foundAdmin = this.admins.find((admin) => admin.email === email);
-    console.log(foundAdmin);
-    return foundAdmin;
-  }
+  // async findAdminByEmail(email: string): Promise<Admin | undefined> {
+  //   const foundAdmin = this.admins.find((admin) => admin.email === email);
+  //   console.log(foundAdmin);
+  //   return foundAdmin;
+  // }
 
   async findAllByLocation() {
     const locations = await this.location.findAll();

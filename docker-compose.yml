@@ -12,7 +12,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
+      POSTGRES_PASSWORD: hor9999
       POSTGRES_DB: attendance_db
     expose:
       - "5433"

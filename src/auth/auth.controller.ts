@@ -6,10 +6,10 @@ import { LoginAdminDto } from './dto/login-admin.dto';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('login')
   async login(@Body() loginAdminDto: LoginAdminDto) {
-    return this.authService.login(loginAdminDto);
+    return await this.authService.login(loginAdminDto);
   }
 }
