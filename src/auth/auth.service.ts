@@ -25,7 +25,7 @@ export class AuthService {
     await this.validateUser(admin.email, admin.password)
 
     const token = await this.generateToken(admin);
-    return {refreshToken:token };
+    return {accessToken:token };
   }
 
   private async generateToken(admin) {
