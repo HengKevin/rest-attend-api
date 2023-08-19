@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { Body, Delete, Param, Post, Query } from '@nestjs/common/decorators';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -6,6 +6,10 @@ import { HistoricAttDto } from './dto/historic-attendance.dto';
 import { HistoricAttendanceService } from './historic-attendance.service';
 import { Response } from 'express';
 import * as fs from 'fs';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorateor';
 
 @Controller('historic-attendance')
 @ApiTags('historic-attendance')
@@ -20,28 +24,36 @@ export class HistoricAttendanceController {
   }
 
   @Get('/v2')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   async findAllPage() {
     return await this.historicAttendanceService.findAllPage();
   }
 
   @Get('/location/:location')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   async findAllByLocation(@Param('location') location: string) {
     return await this.historicAttendanceService.findAllByLocation(location);
   }
 
   @Get('/date/:date')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   async findAllByDate(@Param('date') date: string) {
     return await this.historicAttendanceService.findAllByDate(date);
   }
 
   @Get(':date/:userEmail')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   async findAllByDateAndEmail(
     @Param('date') date: string,
     @Param('userEmail') userEmail: string,
   ) {
     console.log("date:", date);
     console.log("userEmail:", userEmail);
-    
+
 
     return await this.historicAttendanceService.findAllByDateAndEmail(
       date,
@@ -50,6 +62,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/location/date/status')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'status', required: false })
@@ -82,6 +96,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/location/date/status/v2')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   @ApiQuery({ name: 'date', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'status', required: false })
@@ -122,11 +138,15 @@ export class HistoricAttendanceController {
   }
 
   @Get(':userEmail')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   findAllByUserEmail(@Param('userEmail') userEmail: string) {
     return this.historicAttendanceService.findAllByUserEmail(userEmail);
   }
 
   @Get(':date/:userEmail')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   findOneByDateAndEmail(
     @Param('date') date: string,
     @Param('userEmail') userEmail: string,
@@ -139,6 +159,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/attendance/excel/location/date')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   @ApiQuery({ name: 'startDate', required: false })
   @ApiQuery({ name: 'endDate', required: false })
   @ApiQuery({ name: 'location', required: false })
@@ -174,6 +196,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/attendance/excel/:date')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   @ApiQuery({ name: 'date', required: false })
   async excel(@Query('date') date: string, @Res() res: Response) {
     const exportPath = await this.historicAttendanceService.exportDataByDate(
@@ -199,6 +223,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/attendance/excel/month/location')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   @ApiQuery({ name: 'month', required: false })
   @ApiQuery({ name: 'location', required: false })
   @ApiQuery({ name: 'year', required: false })
@@ -233,6 +259,8 @@ export class HistoricAttendanceController {
   }
 
   @Get('/odoo/attendance')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   @ApiQuery({ name: 'startDate', required: true })
   @ApiQuery({ name: 'endDate', required: true })
   @ApiQuery({ name: 'users', required: true })
@@ -267,11 +295,15 @@ export class HistoricAttendanceController {
   }
 
   @Post()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   create(@Body() historicAttendanceDto: HistoricAttDto) {
     return this.historicAttendanceService.create(historicAttendanceDto);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin, Role.Admin)
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.historicAttendanceService.delete(id);
   }
