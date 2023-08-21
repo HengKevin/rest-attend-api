@@ -19,6 +19,8 @@ export class AttendancesController {
     @Query('email') email?: string,
     @Query('location') location?: string,
   ) {
+    console.log("Hello");
+    
     if (date && location) {
       return this.attendanceService.findAllByLocationAndDate(location, date);
     } else if (date) {
