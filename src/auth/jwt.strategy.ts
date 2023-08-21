@@ -9,7 +9,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'random_secret_key',
+      // secretOrKey: 'random_secret_key',
+      secretOrKey: process.env.JWT_ACCESS_SECRET,
     });
   }
 
@@ -20,6 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         'You are not authorized to perform the operation',
       );
     }
+    console.log("payload:", payload);
+    
     return payload;
   }
 }

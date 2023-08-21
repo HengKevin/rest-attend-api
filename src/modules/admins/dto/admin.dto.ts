@@ -4,7 +4,7 @@ import { IsString } from 'class-validator';
 export class AdminDto {
   @IsString()
   @ApiProperty()
-  name: string;
+  username: string;
 
   @IsString()
   @ApiProperty()
@@ -13,6 +13,10 @@ export class AdminDto {
   @IsString()
   @ApiProperty()
   password: string;
+
+  @IsString()
+  @ApiProperty()
+  createBy: string;
 
   @ApiProperty()
   createdAt: Date;

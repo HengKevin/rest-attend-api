@@ -7,25 +7,36 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model SuperAdmin {
+    id        Int      @id @default(autoincrement())
+    username  String
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
+    Admin     Admin[]
+}
+
 model Admin {
-    id               Int           @id @default(autoincrement())
-    name             String
-    email            String        @unique
-    password         String
-    createdAt        DateTime      @default(now())
+    id         Int        @id @default(autoincrement())
+    username   String
+    email      String     @unique
+    password   String
+    superAdmin SuperAdmin @relation(fields: [createBy], references: [email])
+    createBy   String
+    createdAt  DateTime   @default(now())
 }
 
 model Users {
-    id               Int           @id @default(autoincrement())
-    name             String
-    email            String        @unique
-    faceString       String
-    checkIn          String?
-    checkOut         String?
-    location         String
-    createdAt        DateTime      @default(now())
-    attendances      Attendances[]
-    historicAtts     HistoricAtt[]
+    id           Int           @id @default(autoincrement())
+    name         String
+    email        String        @unique
+    faceString   String
+    checkIn      String?
+    checkOut     String?
+    location     String
+    createdAt    DateTime      @default(now())
+    attendances  Attendances[]
+    historicAtts HistoricAtt[]
 }
 
 model Attendances {
@@ -49,21 +60,21 @@ model AttendanceRule {
 }
 
 model HistoricAtt {
-    id          Int      @id @default(autoincrement())
-    date        String?
-    temperature String?
-    location    String?
-    checkIn     String?
-    checkOut    String?
+    id               Int     @id @default(autoincrement())
+    date             String?
+    temperature      String?
+    location         String?
+    checkIn          String?
+    checkOut         String?
     attendanceStatus String?
-    checkOutStatus String?
-    user        Users    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
-    userEmail   String
+    checkOutStatus   String?
+    user             Users   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+    userEmail        String
 
     @@unique([date, userEmail])
 }
 
 model Location {
-    id      Int     @id @default(autoincrement())
-    name    String  @unique()
+    id   Int    @id @default(autoincrement())
+    name String @unique()
 }

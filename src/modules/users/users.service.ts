@@ -1,51 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UseFilters } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationService } from '../location/location.service';
 import { Multer } from 'multer';
+import { HttpExceptionFilter } from 'src/model/http-exception.filter';
 
 export type Admin = any;
 @Injectable()
+@UseFilters(HttpExceptionFilter)
 export class UsersService {
   constructor(
     private prisma: PrismaService,
     private location: LocationService,
-  ) {}
+  ) { }
 
   private readonly admins = [
     {
       userId: 1,
-      email: 'ouk.sovannratana19@kit.edu.kh',
+      email: 'hengratanakvisoth20@kit.edu.kh',
       password: 'password',
     },
     {
       userId: 2,
-      email: 'heng.kevin19@kit.edu.kh',
+      email: 'haiseanghor20@kit.edu.kh',
       password: 'password',
     },
   ];
 
   async create(user: UserDto) {
-    const exists = await this.prisma.users.findUnique({
-      where: { email: user.email },
-    });
-    const locations = await this.prisma.location.findMany();
-    if (exists) {
-      return 'Email already exists';
-    }
-    if (!locations.find((loc) => loc.name === user.location)) {
-      return 'Location does not exist';
-    }
-    if (user.name === '') {
-      return 'Name cannot be empty';
-    }
-
-    const face = user.faceString;
-    const array = face.split(',');
-    if (array.length !== 512) {
-      return 'The face string is not valid, must be 512 floats separated by commas';
-    }
-
     return await this.prisma.users.create({
       data: {
         name: user.name,
@@ -62,7 +44,12 @@ export class UsersService {
         where: { email: data.email },
       });
 
-      if (exists) {
+      const allLocations = await this.findAll()
+      const locationNames = allLocations.map(location => location?.name?.toLocaleLowerCase());
+      const face = data.faceString;
+      const array = face.split(',');
+
+      if (exists || locationNames.length === 0 || !locationNames.includes(data.location.toLocaleLowerCase()) || !data.name || array.length !== 512) {
         continue;
       }
       await this.prisma.users.create({
@@ -93,15 +80,18 @@ export class UsersService {
     };
   }
 
-  async findOne(email: string) {
+  async findOneByEmail(email: string) {
     return await this.prisma.users.findUnique({ where: { email } });
   }
-
-  async findAdminByEmail(email: string): Promise<Admin | undefined> {
-    const foundAdmin = this.admins.find((admin) => admin.email === email);
-    console.log(foundAdmin);
-    return foundAdmin;
+  async findOneById(id: number) {
+    return await this.prisma.users.findUnique({ where: { id } });
   }
+
+  // async findAdminByEmail(email: string): Promise<Admin | undefined> {
+  //   const foundAdmin = this.admins.find((admin) => admin.email === email);
+  //   console.log(foundAdmin);
+  //   return foundAdmin;
+  // }
 
   async findAllByLocation() {
     const locations = await this.location.findAll();
@@ -136,7 +126,13 @@ export class UsersService {
       const exists = await this.prisma.users.findUnique({
         where: { email: data.email },
       });
-      if (exists) {
+      const allLocations = await this.findAll()
+      const locationNames = allLocations.map(location => location?.name?.toLocaleLowerCase());
+      const face = data.faceString;
+      const array = face.split(',');
+
+
+      if (exists || locationNames.length === 0 || !locationNames.includes(data.location.toLocaleLowerCase()) || !data.name || array.length !== 512) {
         continue;
       } else {
         const user = {
