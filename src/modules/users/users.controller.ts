@@ -32,6 +32,8 @@ export class UsersController {
   @Post()
   @ApiCreatedResponse({ type: User })
   create(@Body() userDto: UserDto) {
+    console.log("Hello world");
+    
     return this.userService.create(userDto);
   }
 
